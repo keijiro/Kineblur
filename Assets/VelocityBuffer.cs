@@ -4,9 +4,17 @@ using System.Collections;
 public class VelocityBuffer : MonoBehaviour
 {
     [SerializeField] Shader _shader;
+    [SerializeField] Shader _motionBlurShader;
 
+    Material _motionBlurMaterial;
     RenderTexture _velocityBuffer;
     GameObject _cloneObject;
+
+    void Start()
+    {
+        _motionBlurMaterial = new Material(_motionBlurShader);
+        _motionBlurMaterial.hideFlags = HideFlags.HideAndDontSave;
+    }
 
     void OnEnable()
     {
@@ -41,7 +49,10 @@ public class VelocityBuffer : MonoBehaviour
     void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
         if (_velocityBuffer != null)
-            Graphics.Blit(_velocityBuffer, destination);
+        {
+            _motionBlurMaterial.SetTexture("_VelocityTex", _velocityBuffer);
+            Graphics.Blit(source, destination, _motionBlurMaterial);
+        }
         else
             Graphics.Blit(source, destination);
     }

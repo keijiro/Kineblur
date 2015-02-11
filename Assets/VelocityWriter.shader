@@ -29,7 +29,7 @@
     {
         float4 p1 = mul(_VelocityBuffer_MVP, i.localPosition);
         float4 p2 = mul(UNITY_MATRIX_MVP, i.localPosition);
-        return (p2 - p1) + 0.5;
+        return p2 - p1;
     }
 
     ENDCG
