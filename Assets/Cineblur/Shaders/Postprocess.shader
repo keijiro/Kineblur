@@ -1,4 +1,4 @@
-Shader "Hidden/Velocity Buffer/Motion Blur"
+Shader "Hidden/Cineblur/Postprocess"
 {
     Properties
     {
@@ -16,17 +16,17 @@ Shader "Hidden/Velocity Buffer/Motion Blur"
     sampler2D _VelocityTex;
     float4 _VelocityTex_TexelSize;
 
+    const int nSample = 8;
+
     half4 frag(v2f_img i) : SV_Target 
     {
         float2 v = tex2D(_VelocityTex, i.uv).xy;
-        float4 o = tex2D(_MainTex, i.uv);
         float4 s = tex2D(_MainTex, i.uv);
-        for (int si = 1; si < 10; si++)
+        for (int si = 1; si < nSample; si++)
         {
-            float4 c = tex2D(_MainTex, i.uv - v * (_MainTex_TexelSize.xy * 12 * (si - 0)));
-            s += min(o, c);
+            s += tex2D(_MainTex, i.uv - v * (_MainTex_TexelSize.xy * 4 * (si - nSample / 2)));
         }
-        return s / 10;
+        return s / nSample;
     }
 
     ENDCG 

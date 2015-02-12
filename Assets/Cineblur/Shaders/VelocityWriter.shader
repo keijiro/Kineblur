@@ -1,4 +1,4 @@
-﻿Shader "Velocity Buffer/Writer"
+﻿Shader "Hidden/Cineblur/Velocity Writer"
 {
     CGINCLUDE
 

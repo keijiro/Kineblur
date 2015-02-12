@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class VelocityBuffer : MonoBehaviour
+[AddComponentMenu("Cineblur/Cineblur")]
+public class Cineblur : MonoBehaviour
 {
     [SerializeField] Shader _shader;
     [SerializeField] Shader _motionBlurShader;

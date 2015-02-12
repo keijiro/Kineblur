@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class VelocityWriter : MonoBehaviour
+[AddComponentMenu("Cineblur/Rigid Object")]
+public class CineblurObject : MonoBehaviour
 {
     Matrix4x4 previousMVP;
 
