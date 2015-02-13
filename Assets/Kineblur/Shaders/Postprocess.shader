@@ -22,10 +22,13 @@ Shader "Hidden/Kineblur/Postprocess"
     {
         float2 v = tex2D(_VelocityTex, i.uv).xy;
         float4 s = tex2D(_MainTex, i.uv);
-        for (int si = 1; si < nSample; si++)
+
+        for (int si = 0; si < nSample; si++)
         {
-            s += tex2D(_MainTex, i.uv - v * (_MainTex_TexelSize.xy * 4 * (si - nSample / 2)));
+            float2 d = v * (si - (nSample - 1) / 2) / nSample;
+            s += tex2D(_MainTex, i.uv + d);
         }
+
         return s / nSample;
     }
 
