@@ -1,4 +1,4 @@
-Shader "Hidden/Cineblur/Postprocess"
+Shader "Hidden/Kineblur/Postprocess"
 {
     Properties
     {

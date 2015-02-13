@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[AddComponentMenu("Cineblur/Cineblur")]
-public class Cineblur : MonoBehaviour
+[AddComponentMenu("Kineblur/Kineblur")]
+public class Kineblur : MonoBehaviour
 {
     [SerializeField] Shader _shader;
     [SerializeField] Shader _motionBlurShader;

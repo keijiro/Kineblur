@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[AddComponentMenu("Cineblur/Rigid Object")]
-public class CineblurObject : MonoBehaviour
+[AddComponentMenu("Kineblur/Rigid Object")]
+public class KineblurObject : MonoBehaviour
 {
     Matrix4x4 previousMVP;
 
