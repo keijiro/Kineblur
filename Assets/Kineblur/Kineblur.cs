@@ -37,7 +37,7 @@ public class Kineblur : MonoBehaviour
         if (_velocityBuffer != null)
             RenderTexture.ReleaseTemporary(_velocityBuffer);
 
-        _velocityBuffer = RenderTexture.GetTemporary((int)camera.pixelWidth, (int)camera.pixelHeight, 24, RenderTextureFormat.RGFloat);
+        _velocityBuffer = RenderTexture.GetTemporary((int)camera.pixelWidth, (int)camera.pixelHeight, 24, RenderTextureFormat.RGHalf);
 
         var vc = _cloneObject.camera;
         vc.CopyFrom(camera);
@@ -51,8 +51,23 @@ public class Kineblur : MonoBehaviour
     {
         if (_velocityBuffer != null)
         {
-            _motionBlurMaterial.SetTexture("_VelocityTex", _velocityBuffer);
-            Graphics.Blit(source, destination, _motionBlurMaterial);
+            var rt1 = RenderTexture.GetTemporary(_velocityBuffer.width, _velocityBuffer.height, 0, RenderTextureFormat.RGHalf);
+            var rt2 = RenderTexture.GetTemporary(_velocityBuffer.width, _velocityBuffer.height, 0, RenderTextureFormat.RGHalf);
+
+            _motionBlurMaterial.SetFloat("_BlurDistance", 2);
+            Graphics.Blit(_velocityBuffer, rt1, _motionBlurMaterial, 0);
+            Graphics.Blit(rt1, rt2, _motionBlurMaterial, 1);
+            Graphics.Blit(rt2, rt1, _motionBlurMaterial, 0);
+            Graphics.Blit(rt1, rt2, _motionBlurMaterial, 1);
+            Graphics.Blit(rt2, rt1, _motionBlurMaterial, 0);
+            Graphics.Blit(rt1, rt2, _motionBlurMaterial, 1);
+
+            _motionBlurMaterial.SetTexture("_VelocityTex", rt2);
+            Graphics.Blit(source, destination, _motionBlurMaterial, 2);
+            //Graphics.Blit(rt2, destination);
+
+            RenderTexture.ReleaseTemporary(rt1);
+            RenderTexture.ReleaseTemporary(rt2);
         }
         else
             Graphics.Blit(source, destination);
