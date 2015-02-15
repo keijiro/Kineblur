@@ -22,7 +22,7 @@ public class Kineblur : MonoBehaviour
         if (_cloneObject == null)
         {
             _cloneObject = new GameObject("Velocity Camera", typeof(Camera));
-            _cloneObject.camera.enabled = false;
+            _cloneObject.GetComponent<Camera>().enabled = false;
             _cloneObject.hideFlags = HideFlags.HideAndDontSave;
         }
     }
@@ -37,10 +37,10 @@ public class Kineblur : MonoBehaviour
         if (_velocityBuffer != null)
             RenderTexture.ReleaseTemporary(_velocityBuffer);
 
-        _velocityBuffer = RenderTexture.GetTemporary((int)camera.pixelWidth, (int)camera.pixelHeight, 24, RenderTextureFormat.RGHalf);
+        _velocityBuffer = RenderTexture.GetTemporary((int)GetComponent<Camera>().pixelWidth, (int)GetComponent<Camera>().pixelHeight, 24, RenderTextureFormat.RGHalf);
 
-        var vc = _cloneObject.camera;
-        vc.CopyFrom(camera);
+        var vc = _cloneObject.GetComponent<Camera>();
+        vc.CopyFrom(GetComponent<Camera>());
         vc.backgroundColor = Color.black;
         vc.clearFlags = CameraClearFlags.SolidColor;
         vc.targetTexture = _velocityBuffer;

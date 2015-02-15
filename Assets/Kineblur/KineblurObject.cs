@@ -13,13 +13,13 @@ public class KineblurObject : MonoBehaviour
 
     void LateUpdate()
     {
-        renderer.material.SetMatrix("_VelocityBuffer_MVP", previousMVP);
+        GetComponent<Renderer>().material.SetMatrix("_VelocityBuffer_MVP", previousMVP);
         previousMVP = CalcMVP();
     }
 
     Matrix4x4 CalcMVP()
     {
-        Matrix4x4 M = renderer.localToWorldMatrix;
+        Matrix4x4 M = GetComponent<Renderer>().localToWorldMatrix;
         Matrix4x4 V = Camera.main.worldToCameraMatrix;
         Matrix4x4 P = Camera.main.projectionMatrix;
         return P * V * M;
