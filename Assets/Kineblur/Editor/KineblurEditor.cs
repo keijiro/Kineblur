@@ -12,11 +12,10 @@ public class KineblurEditor : Editor
 
     GUIContent labelDebug;
 
-    static int[] exposureOptions = { 0, 1, 2, 3, 4, 5 };
+    static int[] exposureOptions = { 0, 1, 2, 3, 4 };
 
     static GUIContent[] exposureOptionLabels = {
         new GUIContent("Realtime"),
-        new GUIContent("1 \u2044 8"),
         new GUIContent("1 \u2044 15"),
         new GUIContent("1 \u2044 30"),
         new GUIContent("1 \u2044 60"),

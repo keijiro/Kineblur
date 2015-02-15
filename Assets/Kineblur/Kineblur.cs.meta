@@ -3,8 +3,10 @@ guid: 22cd43f44031a47e69b646e047dc579d
 MonoImporter:
   serializedVersion: 2
   defaultReferences:
-  - _shader: {fileID: 4800000, guid: cd0074fab07a543a1851bd21e9fc9142, type: 3}
-  - _motionBlurShader: {fileID: 4800000, guid: 4ec89d715cde545d69f4f720d04a42c8, type: 3}
+  - _gaussianShader: {fileID: 4800000, guid: 733a4aab9a8354174a7f71e108659097, type: 3}
+  - _reconstructionShader: {fileID: 4800000, guid: 4ec89d715cde545d69f4f720d04a42c8,
+      type: 3}
+  - _velocityShader: {fileID: 4800000, guid: cd0074fab07a543a1851bd21e9fc9142, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
