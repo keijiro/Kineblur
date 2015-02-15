@@ -56,7 +56,7 @@ Shader "Hidden/Kineblur/Postprocess"
     #elif QUALITY_MEDIUM
     static const int sample_count = 9;
     #else // QUALITY_HIGH
-    static const int sample_count = 18;
+    static const int sample_count = 19;
     #endif
 
     half4 frag_reconstruct(v2f_img i) : SV_Target
@@ -73,6 +73,14 @@ Shader "Hidden/Kineblur/Postprocess"
             uv += ds;
         }
         return s / sample_count;
+    }
+
+    // Debug display shader.
+
+    half4 frag_debug(v2f_img i) : SV_Target
+    {
+        float2 v = tex2D(_VelocityTex, i.uv).xy * 8 + 0.5;
+        return half4(v, 0.5, 1);
     }
 
     ENDCG 
@@ -110,6 +118,15 @@ Shader "Hidden/Kineblur/Postprocess"
             #pragma glsl
             #pragma vertex vert_img
             #pragma fragment frag_reconstruct
+            ENDCG
+        }
+        Pass
+        {
+            ZTest Always Cull Off ZWrite Off
+            Fog { Mode off }      
+            CGPROGRAM
+            #pragma vertex vert_img
+            #pragma fragment frag_debug
             ENDCG
         }
     }

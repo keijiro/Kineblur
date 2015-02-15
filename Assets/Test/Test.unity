@@ -1051,3 +1051,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _shader: {fileID: 4800000, guid: cd0074fab07a543a1851bd21e9fc9142, type: 3}
   _motionBlurShader: {fileID: 4800000, guid: 4ec89d715cde545d69f4f720d04a42c8, type: 3}
+  _exposureTime: 0
+  _velocityFilter: 3
+  _sampleCount: 2
+  _debug: 0
