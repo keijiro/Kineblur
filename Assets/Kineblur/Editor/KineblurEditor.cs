@@ -8,6 +8,7 @@ public class KineblurEditor : Editor
     SerializedProperty propExposureTime;
     SerializedProperty propVelocityFilter;
     SerializedProperty propSampleCount;
+    SerializedProperty propDither;
     SerializedProperty propDebug;
 
     GUIContent labelDebug;
@@ -27,6 +28,7 @@ public class KineblurEditor : Editor
         propExposureTime = serializedObject.FindProperty("_exposureTime");
         propVelocityFilter = serializedObject.FindProperty("_velocityFilter");
         propSampleCount = serializedObject.FindProperty("_sampleCount");
+        propDither = serializedObject.FindProperty("_dither");
         propDebug = serializedObject.FindProperty("_debug");
         labelDebug = new GUIContent("Visualize Velocity");
     }
@@ -38,6 +40,7 @@ public class KineblurEditor : Editor
         EditorGUILayout.IntPopup(propExposureTime, exposureOptionLabels, exposureOptions);
         EditorGUILayout.PropertyField(propVelocityFilter);
         EditorGUILayout.PropertyField(propSampleCount);
+        EditorGUILayout.PropertyField(propDither);
         EditorGUILayout.PropertyField(propDebug, labelDebug);
 
         serializedObject.ApplyModifiedProperties();

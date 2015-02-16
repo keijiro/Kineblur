@@ -13,6 +13,8 @@ public class Kineblur : MonoBehaviour
     public enum SampleCount { Low, Medium, High, UltraHigh }
     [SerializeField] SampleCount _sampleCount = SampleCount.Medium;
 
+    [SerializeField] bool _dither;
+
     [SerializeField] bool _debug;
 
     [SerializeField] Shader _gaussianShader;
@@ -102,6 +104,11 @@ public class Kineblur : MonoBehaviour
             _reconstructionMaterial.DisableKeyword("QUALITY_HIGH");
             _reconstructionMaterial.EnableKeyword("QUALITY_SUPER");
         }
+
+        if (_dither)
+            _reconstructionMaterial.EnableKeyword("DITHER_ON");
+        else
+            _reconstructionMaterial.DisableKeyword("DITHER_ON");
 
         if (_exposureTime == 0)
         {
