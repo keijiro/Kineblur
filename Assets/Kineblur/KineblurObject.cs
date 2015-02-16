@@ -16,7 +16,7 @@ public class KineblurObject : MonoBehaviour
 
         Matrix4x4 M = targetRenderer.localToWorldMatrix;
         Matrix4x4 V = mainCamera.worldToCameraMatrix;
-        Matrix4x4 P = mainCamera.projectionMatrix;
+        Matrix4x4 P = GL.GetGPUProjectionMatrix(mainCamera.projectionMatrix, true);
 
         return P * V * M;
     }
