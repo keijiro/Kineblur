@@ -4,30 +4,82 @@ using System.Collections;
 [AddComponentMenu("Kineblur/Kineblur")]
 public class Kineblur : MonoBehaviour
 {
-    public enum ExposureTime { Realtime, OnePerFifteen, OnePerThirty, OnePerSixty, OnePerOneTwentyFive }
+    #region Public Properties
+
+    // Exposure time (shutter speed).
+    public enum ExposureTime {
+        Realtime, OnePerFifteen, OnePerThirty, OnePerSixty, OnePerOneTwentyFive
+    }
+
     [SerializeField] ExposureTime _exposureTime = ExposureTime.Realtime;
 
+    public ExposureTime exposureTime {
+        get { return _exposureTime; }
+        set { _exposureTime = value; }
+    }
+
+    // Velocity buffer filter.
     public enum VelocityFilter { Off, Low, Medium, High }
+
     [SerializeField] VelocityFilter _velocityFilter = VelocityFilter.Low;
 
+    public VelocityFilter velocityFilter {
+        get { return _velocityFilter; }
+        set { _velocityFilter = value; }
+    }
+
+    // Sample count.
     public enum SampleCount { Low, Medium, High, UltraHigh }
+
     [SerializeField] SampleCount _sampleCount = SampleCount.Medium;
 
+    public SampleCount sampleCount {
+        get { return _sampleCount; }
+        set { _sampleCount = value; }
+    }
+
+    // Dithering.
     [SerializeField] bool _dither;
 
+    public bool dither {
+        get { return _dither; }
+        set { _dither = value; }
+    }
+
+    // Debug display (exposed only to Editor).
     [SerializeField] bool _debug;
 
+    #endregion
+
+    #region External Asset References
+
+    [SerializeField] Shader _velocityShader;
     [SerializeField] Shader _gaussianShader;
     [SerializeField] Shader _reconstructionShader;
-    [SerializeField] Shader _velocityShader;
 
-    RenderTexture _velocityBuffer;
-    GameObject _cloneCamera;
+    // Materials for handling the shaders.
     Material _gaussianMaterial;
     Material _reconstructionMaterial;
+
+    #endregion
+
+    #region Private Objects
+
+    // Velocity buffer.
+    RenderTexture _velocityBuffer;
+
+    // Velocity camera (used for rendering the velocity buffer).
+    GameObject _velocityCamera;
+
+    // V*P matrix in the previous frame.
     Matrix4x4 _previousVPMatrix;
 
+    // Exposure time settings.
     static int[] exposureTimeTable = { 1, 15, 30, 60, 125 };
+
+    #endregion
+
+    #region Private Methods
 
     Matrix4x4 CalculateVPMatrix()
     {
@@ -37,45 +89,6 @@ public class Kineblur : MonoBehaviour
         return P * V;
     }
 
-    void Start()
-    {
-        _gaussianMaterial = new Material(_gaussianShader);
-        _gaussianMaterial.hideFlags = HideFlags.HideAndDontSave;
-
-        _reconstructionMaterial = new Material(_reconstructionShader);
-        _reconstructionMaterial.hideFlags = HideFlags.HideAndDontSave;
-
-        _previousVPMatrix = CalculateVPMatrix();
-    }
-
-    void OnEnable()
-    {
-        if (_cloneCamera == null)
-        {
-            _cloneCamera = new GameObject("Velocity Camera", typeof(Camera));
-            _cloneCamera.camera.enabled = false;
-            _cloneCamera.hideFlags = HideFlags.HideAndDontSave;
-        }
-    }
-
-    void OnDisable()
-    {
-        if (_cloneCamera != null) DestroyImmediate(_cloneCamera);
-    }
-
-    void OnPreRender()
-    {
-        if (_velocityBuffer != null) RenderTexture.ReleaseTemporary(_velocityBuffer);
-        _velocityBuffer = RenderTexture.GetTemporary((int)camera.pixelWidth, (int)camera.pixelHeight, 24, RenderTextureFormat.RGHalf);
-
-        var vc = _cloneCamera.camera;
-        vc.CopyFrom(camera);
-        vc.backgroundColor = Color.black;
-        vc.clearFlags = CameraClearFlags.SolidColor;
-        vc.targetTexture = _velocityBuffer;
-        vc.RenderWithShader(_velocityShader, null);
-    }
-
     int GetVelocityDownSampleLevel()
     {
         if (_velocityFilter == VelocityFilter.Medium) return 2;
@@ -83,21 +96,8 @@ public class Kineblur : MonoBehaviour
         return 1;
     }
 
-    void LateUpdate()
+    void UpdateReconstructionMaterial()
     {
-        Shader.SetGlobalMatrix("_KineblurVPMatrix", _previousVPMatrix);
-        Shader.SetGlobalMatrix("_KineblurBackMatrix", Matrix4x4.identity);
-        _previousVPMatrix = CalculateVPMatrix();
-    }
-
-    void OnRenderImage(RenderTexture source, RenderTexture destination)
-    {
-        if (_velocityBuffer == null)
-        {
-            Graphics.Blit(source, destination);
-            return;
-        }
-
         if (_sampleCount == SampleCount.Low)
         {
             _reconstructionMaterial.DisableKeyword("QUALITY_MEDIUM");
@@ -134,52 +134,138 @@ public class Kineblur : MonoBehaviour
         }
         else
         {
-            var s = 1.0f / (Time.smoothDeltaTime * exposureTimeTable[(int)_exposureTime]);
-            _reconstructionMaterial.SetFloat("_VelocityScale", s);
+            var s = Time.smoothDeltaTime * exposureTimeTable[(int)_exposureTime];
+            _reconstructionMaterial.SetFloat("_VelocityScale", 1.0f / s);
         }
+    }
+
+    #endregion
+
+    #region MonoBehaviour Functions
+
+    void Start()
+    {
+        _gaussianMaterial = new Material(_gaussianShader);
+        _gaussianMaterial.hideFlags = HideFlags.HideAndDontSave;
+
+        _reconstructionMaterial = new Material(_reconstructionShader);
+        _reconstructionMaterial.hideFlags = HideFlags.HideAndDontSave;
+
+        _previousVPMatrix = CalculateVPMatrix();
+
+        // Default velocity writer matrix for static objects.
+        Shader.SetGlobalMatrix("_KineblurBackMatrix", Matrix4x4.identity);
+    }
+
+    void OnEnable()
+    {
+        if (_velocityCamera == null)
+        {
+            // Make a velocity camera instance.
+            _velocityCamera = new GameObject("Velocity Camera", typeof(Camera));
+            _velocityCamera.hideFlags = HideFlags.HideAndDontSave;
+            _velocityCamera.GetComponent<Camera>().enabled = false;
+        }
+    }
+
+    void OnDisable()
+    {
+        // Delete the velocity camera.
+        if (_velocityCamera != null) DestroyImmediate(_velocityCamera);
+    }
+
+    void LateUpdate()
+    {
+        // Update the VP matrix for the velocity writer.
+        Shader.SetGlobalMatrix("_KineblurVPMatrix", _previousVPMatrix);
+
+        // Store the current VP matrix.
+        _previousVPMatrix = CalculateVPMatrix();
+    }
+
+    void OnPreRender()
+    {
+        var cam = GetComponent<Camera>();
+        var vcam = _velocityCamera.GetComponent<Camera>();
+
+        // Recreate the velocity buffer.
+        if (_velocityBuffer != null)
+            RenderTexture.ReleaseTemporary(_velocityBuffer);
+
+        _velocityBuffer = RenderTexture.GetTemporary(
+            (int)cam.pixelWidth,
+            (int)cam.pixelHeight,
+            24,
+            RenderTextureFormat.RGHalf
+        );
+
+        // Reset the velocity camera and request rendering.
+        vcam.CopyFrom(cam);
+        vcam.clearFlags = CameraClearFlags.SolidColor;
+        vcam.backgroundColor = Color.black;
+        vcam.targetTexture = _velocityBuffer;
+        vcam.RenderWithShader(_velocityShader, null);
+    }
+
+    void OnRenderImage(RenderTexture source, RenderTexture destination)
+    {
+        // Simply blit if not ready.
+        if (_velocityBuffer == null) {
+            Graphics.Blit(source, destination);
+            return;
+        }
+
+        UpdateReconstructionMaterial();
 
         RenderTexture rt1 = null;
         RenderTexture rt2 = null;
 
         if (_velocityFilter == VelocityFilter.Off)
         {
+            // Use the velocity buffer directly.
             _reconstructionMaterial.SetTexture("_VelocityTex", _velocityBuffer);
         }
         else
         {
-            {
-                var ds = GetVelocityDownSampleLevel();
-                var width = _velocityBuffer.width / ds;
-                var height = _velocityBuffer.height / ds;
-                var format = _velocityBuffer.format;
-                rt1 = RenderTexture.GetTemporary(width, height, 0, format);
-                rt2 = RenderTexture.GetTemporary(width, height, 0, format);
-            }
+            // Get temporary buffers.
+            var ds = GetVelocityDownSampleLevel();
+            var width = _velocityBuffer.width / ds;
+            var height = _velocityBuffer.height / ds;
+            var format = _velocityBuffer.format;
+            rt1 = RenderTexture.GetTemporary(width, height, 0, format);
+            rt2 = RenderTexture.GetTemporary(width, height, 0, format);
 
             if (_velocityFilter == VelocityFilter.Low)
             {
+                // Apply the gaussian filter without downsampling.
                 Graphics.Blit(_velocityBuffer, rt1, _gaussianMaterial, 1);
                 Graphics.Blit(rt1, rt2, _gaussianMaterial, 2);
             }
-            else if (_velocityFilter == VelocityFilter.High)
+            else if (_velocityFilter == VelocityFilter.Medium)
             {
-                Graphics.Blit(_velocityBuffer, rt2, _gaussianMaterial, 0);
+                // Downsample (1/2) and then apply the gaussian filter.
+                Graphics.Blit(_velocityBuffer, rt2);
                 Graphics.Blit(rt2, rt1, _gaussianMaterial, 1);
                 Graphics.Blit(rt1, rt2, _gaussianMaterial, 2);
             }
             else
             {
-                Graphics.Blit(_velocityBuffer, rt2);
+                // Downsample (1/4) and then apply the gaussian filter.
+                Graphics.Blit(_velocityBuffer, rt2, _gaussianMaterial, 0);
                 Graphics.Blit(rt2, rt1, _gaussianMaterial, 1);
                 Graphics.Blit(rt1, rt2, _gaussianMaterial, 2);
             }
 
+            // Use the filtered velocity buffer.
             _reconstructionMaterial.SetTexture("_VelocityTex", rt2);
         }
 
+        // Reconstruction.
         Graphics.Blit(source, destination, _reconstructionMaterial, _debug ? 1 : 0);
 
         if (rt1 != null) RenderTexture.ReleaseTemporary(rt1);
         if (rt2 != null) RenderTexture.ReleaseTemporary(rt2);
     }
+
+    #endregion
 }
