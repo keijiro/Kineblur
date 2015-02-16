@@ -25,8 +25,17 @@ public class Kineblur : MonoBehaviour
     GameObject _cloneCamera;
     Material _gaussianMaterial;
     Material _reconstructionMaterial;
+    Matrix4x4 _previousVPMatrix;
 
     static int[] exposureTimeTable = { 1, 15, 30, 60, 125 };
+
+    Matrix4x4 CalculateVPMatrix()
+    {
+        var cam = GetComponent<Camera>();
+        Matrix4x4 V = cam.worldToCameraMatrix;
+        Matrix4x4 P = GL.GetGPUProjectionMatrix(cam.projectionMatrix, true);
+        return P * V;
+    }
 
     void Start()
     {
@@ -35,6 +44,8 @@ public class Kineblur : MonoBehaviour
 
         _reconstructionMaterial = new Material(_reconstructionShader);
         _reconstructionMaterial.hideFlags = HideFlags.HideAndDontSave;
+
+        _previousVPMatrix = CalculateVPMatrix();
     }
 
     void OnEnable()
@@ -70,6 +81,13 @@ public class Kineblur : MonoBehaviour
         if (_velocityFilter == VelocityFilter.Medium) return 2;
         if (_velocityFilter == VelocityFilter.High) return 4;
         return 1;
+    }
+
+    void LateUpdate()
+    {
+        Shader.SetGlobalMatrix("_KineblurVPMatrix", _previousVPMatrix);
+        Shader.SetGlobalMatrix("_KineblurBackMatrix", Matrix4x4.identity);
+        _previousVPMatrix = CalculateVPMatrix();
     }
 
     void OnRenderImage(RenderTexture source, RenderTexture destination)

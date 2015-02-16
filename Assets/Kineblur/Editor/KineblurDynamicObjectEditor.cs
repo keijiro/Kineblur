@@ -2,8 +2,8 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections;
 
-[CustomEditor(typeof(KineblurObject)), CanEditMultipleObjects]
-public class KineblurObjectEditor : Editor
+[CustomEditor(typeof(KineblurDynamicObject)), CanEditMultipleObjects]
+public class KineblurDynamicObjectEditor : Editor
 {
     public override void OnInspectorGUI()
     {

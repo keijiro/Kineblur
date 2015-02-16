@@ -171,7 +171,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 1
 --- !u!1 &201497957
 GameObject:
   m_ObjectHideFlags: 0
@@ -183,13 +183,12 @@ GameObject:
   - 33: {fileID: 201497960}
   - 64: {fileID: 201497959}
   - 23: {fileID: 201497958}
-  - 114: {fileID: 201497962}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!23 &201497958
 Renderer:
@@ -241,19 +240,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1299726704}
   m_RootOrder: 0
---- !u!114 &201497962
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 201497957}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33ff000e42a4c4d7f9f66ef9714805f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &265385257
 GameObject:
   m_ObjectHideFlags: 0
@@ -264,25 +252,13 @@ GameObject:
   - 4: {fileID: 265385261}
   - 33: {fileID: 265385260}
   - 23: {fileID: 265385259}
-  - 114: {fileID: 265385258}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
---- !u!114 &265385258
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 265385257}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33ff000e42a4c4d7f9f66ef9714805f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!23 &265385259
 Renderer:
   m_ObjectHideFlags: 0
@@ -320,7 +296,7 @@ Transform:
   m_LocalPosition: {x: 1, y: 1.5, z: 2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1299726704}
   m_RootOrder: 3
 --- !u!1 &736900521
 GameObject:
@@ -332,25 +308,13 @@ GameObject:
   - 4: {fileID: 736900525}
   - 33: {fileID: 736900524}
   - 23: {fileID: 736900523}
-  - 114: {fileID: 736900522}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
---- !u!114 &736900522
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 736900521}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33ff000e42a4c4d7f9f66ef9714805f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!23 &736900523
 Renderer:
   m_ObjectHideFlags: 0
@@ -388,7 +352,7 @@ Transform:
   m_LocalPosition: {x: -1, y: 1.5, z: 2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1299726704}
   m_RootOrder: 4
 --- !u!1 &850099802
 GameObject:
@@ -471,7 +435,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 2
 --- !u!54 &850099808
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -583,7 +547,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 3
 --- !u!1 &1246742548
 GameObject:
   m_ObjectHideFlags: 0
@@ -612,7 +576,7 @@ Transform:
   m_Children:
   - {fileID: 2136470524}
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 4
 --- !u!95 &1246742550
 Animator:
   serializedVersion: 3
@@ -628,6 +592,41 @@ Animator:
   m_ApplyRootMotion: 1
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!1 &1299726703
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1299726704}
+  m_Layer: 0
+  m_Name: BG And Lights
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 4294967295
+  m_IsActive: 1
+--- !u!4 &1299726704
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1299726703}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 201497961}
+  - {fileID: 1481016088}
+  - {fileID: 1486746246}
+  - {fileID: 265385261}
+  - {fileID: 736900525}
+  - {fileID: 1976638279}
+  - {fileID: 1460788326}
+  - {fileID: 1921924992}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
 --- !u!1 &1460788324
 GameObject:
   m_ObjectHideFlags: 0
@@ -642,7 +641,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!108 &1460788325
 Light:
@@ -689,8 +688,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_Father: {fileID: 1299726704}
+  m_RootOrder: 6
 --- !u!1 &1481016085
 GameObject:
   m_ObjectHideFlags: 0
@@ -701,13 +700,12 @@ GameObject:
   - 4: {fileID: 1481016088}
   - 33: {fileID: 1481016087}
   - 23: {fileID: 1481016086}
-  - 114: {fileID: 1481016089}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!23 &1481016086
 Renderer:
@@ -746,19 +744,8 @@ Transform:
   m_LocalPosition: {x: 1, y: .5, z: 2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1299726704}
   m_RootOrder: 1
---- !u!114 &1481016089
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1481016085}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33ff000e42a4c4d7f9f66ef9714805f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1486746242
 GameObject:
   m_ObjectHideFlags: 0
@@ -769,25 +756,13 @@ GameObject:
   - 4: {fileID: 1486746246}
   - 33: {fileID: 1486746245}
   - 23: {fileID: 1486746244}
-  - 114: {fileID: 1486746243}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
---- !u!114 &1486746243
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1486746242}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33ff000e42a4c4d7f9f66ef9714805f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!23 &1486746244
 Renderer:
   m_ObjectHideFlags: 0
@@ -825,7 +800,7 @@ Transform:
   m_LocalPosition: {x: -1, y: .5, z: 2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1299726704}
   m_RootOrder: 2
 --- !u!1 &1921924990
 GameObject:
@@ -841,7 +816,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!108 &1921924991
 Light:
@@ -888,8 +863,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_Father: {fileID: 1299726704}
+  m_RootOrder: 7
 --- !u!1 &1976638277
 GameObject:
   m_ObjectHideFlags: 0
@@ -904,7 +879,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!108 &1976638278
 Light:
@@ -951,8 +926,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_Father: {fileID: 1299726704}
+  m_RootOrder: 5
 --- !u!1 &2136470519
 GameObject:
   m_ObjectHideFlags: 0
@@ -1051,7 +1026,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _exposureTime: 0
   _velocityFilter: 2
-  _sampleCount: 2
+  _sampleCount: 1
+  _dither: 1
   _debug: 0
   _gaussianShader: {fileID: 4800000, guid: 733a4aab9a8354174a7f71e108659097, type: 3}
   _reconstructionShader: {fileID: 4800000, guid: 4ec89d715cde545d69f4f720d04a42c8,

@@ -4,7 +4,8 @@
 
     #include "UnityCG.cginc"
 
-    float4x4 _VelocityBuffer_MVP;
+    float4x4 _KineblurVPMatrix;
+    float4x4 _KineblurBackMatrix;
 
     struct appdata
     {
@@ -23,7 +24,7 @@
         v2f o;
         o.position = mul(UNITY_MATRIX_MVP, v.position);
         o.coord1 = o.position;
-        o.coord2 = mul(_VelocityBuffer_MVP, v.position);
+        o.coord2 = mul(_KineblurVPMatrix, mul(_KineblurBackMatrix, mul(_Object2World, v.position)));
         return o;
     }
 
