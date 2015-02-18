@@ -65,6 +65,7 @@ Shader "Hidden/Kineblur/Velocity"
     {
         Pass
         {
+            Fog { Mode off }      
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
