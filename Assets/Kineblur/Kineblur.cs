@@ -51,6 +51,19 @@ public class Kineblur : MonoBehaviour
         set { _velocityFilter = value; }
     }
 
+    // Depth filter.
+    [SerializeField] bool _depthFilter = false;
+    [SerializeField] float _depthFilterOffset = 0.01f;
+
+    public bool depthFilter {
+        get { return _depthFilter; }
+        set { _depthFilter = value; }
+    }
+    public float depthFilterOffset {
+        get { return _depthFilterOffset; }
+        set { _depthFilterOffset = value; }
+    }
+
     // Sample count.
     public enum SampleCount { Low, Medium, High, UltraHigh }
 
@@ -121,6 +134,14 @@ public class Kineblur : MonoBehaviour
 
     void UpdateReconstructionMaterial()
     {
+        if (_depthFilter)
+        {
+            _reconstructionMaterial.EnableKeyword("DEPTH_FILTER_ON");
+            _reconstructionMaterial.SetFloat("_DepthFilterOffset", _depthFilterOffset);
+        }
+        else
+            _reconstructionMaterial.DisableKeyword("DEPTH_FILTER_ON");
+
         if (_sampleCount == SampleCount.Low)
         {
             _reconstructionMaterial.DisableKeyword("QUALITY_MEDIUM");
@@ -210,6 +231,10 @@ public class Kineblur : MonoBehaviour
     {
         var cam = GetComponent<Camera>();
         var vcam = _velocityCamera.GetComponent<Camera>();
+
+        // Needs a camera depth texture for the depth filter.
+        if (_depthFilter)
+            cam.depthTextureMode |= DepthTextureMode.Depth;
 
         // Recreate the velocity buffer.
         if (_velocityBuffer != null)

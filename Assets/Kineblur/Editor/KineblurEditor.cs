@@ -30,6 +30,8 @@ public class KineblurEditor : Editor
 {
     SerializedProperty propExposureTime;
     SerializedProperty propVelocityFilter;
+    SerializedProperty propDepthFilter;
+    SerializedProperty propDepthFilterOffset;
     SerializedProperty propSampleCount;
     SerializedProperty propDither;
     SerializedProperty propDebug;
@@ -50,6 +52,8 @@ public class KineblurEditor : Editor
     {
         propExposureTime = serializedObject.FindProperty("_exposureTime");
         propVelocityFilter = serializedObject.FindProperty("_velocityFilter");
+        propDepthFilter = serializedObject.FindProperty("_depthFilter");
+        propDepthFilterOffset = serializedObject.FindProperty("_depthFilterOffset");
         propSampleCount = serializedObject.FindProperty("_sampleCount");
         propDither = serializedObject.FindProperty("_dither");
         propDebug = serializedObject.FindProperty("_debug");
@@ -61,8 +65,15 @@ public class KineblurEditor : Editor
         serializedObject.Update();
 
         EditorGUILayout.IntPopup(propExposureTime, exposureOptionLabels, exposureOptions);
+
         EditorGUILayout.PropertyField(propVelocityFilter);
+
+        EditorGUILayout.PropertyField(propDepthFilter);
+        if (propDepthFilter.hasMultipleDifferentValues || propDepthFilter.boolValue)
+            EditorGUILayout.Slider(propDepthFilterOffset, 0.0001f, 0.01f);
+
         EditorGUILayout.PropertyField(propSampleCount);
+
         EditorGUILayout.PropertyField(propDither);
         EditorGUILayout.PropertyField(propDebug, labelDebug);
 

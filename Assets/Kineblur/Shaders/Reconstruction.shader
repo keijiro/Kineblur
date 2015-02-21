@@ -35,6 +35,7 @@ Shader "Hidden/Kineblur/Reconstruction"
 
     #pragma multi_compile QUALITY_LOW QUALITY_MEDIUM QUALITY_HIGH QUALITY_SUPER
     #pragma multi_compile DITHER_OFF DITHER_ON
+    #pragma multi_compile DEPTH_FILTER_OFF DEPTH_FILTER_ON
 
     #include "UnityCG.cginc"
 
@@ -46,17 +47,22 @@ Shader "Hidden/Kineblur/Reconstruction"
 
     float _VelocityScale;
 
+    #ifdef DEPTH_FILTER_ON
+    sampler2D_float _CameraDepthTexture;
+    float _DepthFilterOffset;
+    #endif
+
     #ifdef QUALITY_LOW
-    static const int sample_count = 5;
+    static const int sample_count = 4;
     static const float dither_scale = 0.8;
     #elif QUALITY_MEDIUM
-    static const int sample_count = 9;
+    static const int sample_count = 8;
     static const float dither_scale = 0.4;
     #elif QUALITY_HIGH
-    static const int sample_count = 19;
+    static const int sample_count = 16;
     static const float dither_scale = 0.2;
     #else // QUALITY_SUPER
-    static const int sample_count = 31;
+    static const int sample_count = 24;
     static const float dither_scale = 0.06;
     #endif
 
@@ -84,16 +90,32 @@ Shader "Hidden/Kineblur/Reconstruction"
         v *= (dither(i.uv) - 0.5) * dither_scale + 1;
         #endif
 
+        #ifdef DEPTH_FILTER_ON
+        float d0 = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
+        #endif
+
         float2 ds = v / sample_count;
         float2 uv = i.uv - ds * (sample_count - 1) / 2;
 
-        float4 s = 0;
+        float4 sc = tex2D(_MainTex, i.uv.xy);
+        float sa = 1;
+
         for (int c = 0; c < sample_count; c++)
         {
-            s += tex2D(_MainTex, uv);
+            #ifdef DEPTH_FILTER_ON
+            float d = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, uv);
+            float f = d > d0 - _DepthFilterOffset;
+            #else
+            float f = 1;
+            #endif
+
+            sc += tex2D(_MainTex, uv) * f;
+            sa += f;
+
             uv += ds;
         }
-        return s / sample_count;
+
+        return sc / sa;
     }
 
     // Debug shader (visualizes the velocity buffer).
