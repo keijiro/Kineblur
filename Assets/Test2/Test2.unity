@@ -24,62 +24,6 @@ RenderSettings:
   m_AmbientEquatorColor: {r: .114, g: .125, b: .133000001, a: 1}
   m_AmbientGroundColor: {r: .0469999984, g: .0430000015, b: .0350000001, a: 1}
   m_AmbientIntensity: 1
-  m_AmbientProbe:
-    sh[ 0]: .213545695
-    sh[ 1]: -.0028162268
-    sh[ 2]: -.0155946761
-    sh[ 3]: .00900340267
-    sh[ 4]: .00708553661
-    sh[ 5]: -.012272818
-    sh[ 6]: .0124297328
-    sh[ 7]: -.0126898456
-    sh[ 8]: .0299782436
-    sh[ 9]: .267404377
-    sh[10]: .0532891229
-    sh[11]: -.0243997946
-    sh[12]: .0140870521
-    sh[13]: .0112909349
-    sh[14]: -.0195565484
-    sh[15]: .0171076842
-    sh[16]: -.0183791611
-    sh[17]: .0407315902
-    sh[18]: .360882461
-    sh[19]: .155464888
-    sh[20]: -.0415646359
-    sh[21]: .0239975899
-    sh[22]: .0201131552
-    sh[23]: -.0348364115
-    sh[24]: .0204900075
-    sh[25]: -.0262403302
-    sh[26]: .0463410281
-  m_AmbientProbeInGamma:
-    sh[ 0]: .476747066
-    sh[ 1]: -.00971156731
-    sh[ 2]: -.0170334727
-    sh[ 3]: .00983387325
-    sh[ 4]: .00891478732
-    sh[ 5]: -.0154420519
-    sh[ 6]: .0111560337
-    sh[ 7]: -.00941284187
-    sh[ 8]: .0280376337
-    sh[ 9]: .519480824
-    sh[10]: .0557060502
-    sh[11]: -.0206461698
-    sh[12]: .0119194714
-    sh[13]: .0108497059
-    sh[14]: -.0187933017
-    sh[15]: .0126691684
-    sh[16]: -.0111335535
-    sh[17]: .0315863937
-    sh[18]: .584145308
-    sh[19]: .146928236
-    sh[20]: -.0261248648
-    sh[21]: .0150831277
-    sh[22]: .0138730481
-    sh[23]: -.0240290165
-    sh[24]: .0127149373
-    sh[25]: -.013171182
-    sh[26]: .030543793
   m_AmbientMode: 0
   m_SkyboxMaterial: {fileID: 2100000, guid: 9d6db3102f0bb4c8db49da5fb18dd92e, type: 2}
   m_HaloStrength: .5
@@ -92,7 +36,6 @@ RenderSettings:
   m_ReflectionBounces: 1
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
-  m_GeneratedSkyboxReflection: {fileID: 0}
   m_Sun: {fileID: 1876862182}
 --- !u!127 &3
 LevelGameManager:
@@ -100,11 +43,9 @@ LevelGameManager:
 --- !u!157 &4
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 4
+  serializedVersion: 5
   m_GIWorkflowMode: 0
-  m_LightmapsModeLegacy: 1
   m_LightmapsMode: 1
-  m_UseDualLightmapsInForward: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -234,6 +175,7 @@ Transform:
   m_Children:
   - {fileID: 1297636761}
   - {fileID: 911810763}
+  - {fileID: 1836432975}
   m_Father: {fileID: 0}
   m_RootOrder: 2
 --- !u!95 &507247257
@@ -567,6 +509,78 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1297636758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0279f2ee6b4f408785a85561491ea9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &1836432974
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1836432975}
+  - 23: {fileID: 1836432976}
+  - 33: {fileID: 1836432977}
+  - 114: {fileID: 1836432978}
+  m_Layer: 0
+  m_Name: Cover
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1836432975
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1836432974}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: .5, y: -.5, z: -1.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 507247256}
+  m_RootOrder: 2
+--- !u!23 &1836432976
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1836432974}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_Materials:
+  - {fileID: 2100000, guid: f0e131388921e4fbeb4aa340f5a308ff, type: 2}
+  m_SubsetIndices: 
+  m_StaticBatchRoot: {fileID: 0}
+  m_UseLightProbes: 1
+  m_ReflectionProbeUsage: 1
+  m_ProbeAnchor: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 1
+  m_ImportantGI: 0
+  m_AutoUVMaxDistance: .5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+--- !u!33 &1836432977
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1836432974}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1836432978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1836432974}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f0279f2ee6b4f408785a85561491ea9b, type: 3}
