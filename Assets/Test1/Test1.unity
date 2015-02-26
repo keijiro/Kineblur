@@ -24,62 +24,6 @@ RenderSettings:
   m_AmbientEquatorColor: {r: .114, g: .125, b: .133000001, a: 1}
   m_AmbientGroundColor: {r: .0469999984, g: .0430000015, b: .0350000001, a: 1}
   m_AmbientIntensity: 1
-  m_AmbientProbe:
-    sh[ 0]: .216506884
-    sh[ 1]: -.00112874759
-    sh[ 2]: .0117405504
-    sh[ 3]: -.00572662288
-    sh[ 4]: -.00433114404
-    sh[ 5]: .00888000987
-    sh[ 6]: .0174029265
-    sh[ 7]: -.0233258586
-    sh[ 8]: .0340223759
-    sh[ 9]: .267444104
-    sh[10]: .0529865436
-    sh[11]: .0184802338
-    sh[12]: -.00901455246
-    sh[13]: -.00684489543
-    sh[14]: .0140336473
-    sh[15]: .0238846689
-    sh[16]: -.0331823416
-    sh[17]: .0457765646
-    sh[18]: .342753798
-    sh[19]: .1454418
-    sh[20]: .031213522
-    sh[21]: -.015226352
-    sh[22]: -.011906188
-    sh[23]: .0244097114
-    sh[24]: .0290148407
-    sh[25]: -.0453537367
-    sh[26]: .0516550615
-  m_AmbientProbeInGamma:
-    sh[ 0]: .472247541
-    sh[ 1]: -.0111405477
-    sh[ 2]: .0121728331
-    sh[ 3]: -.0059360587
-    sh[ 4]: -.00544249406
-    sh[ 5]: .0111602694
-    sh[ 6]: .0153065026
-    sh[ 7]: -.0172439795
-    sh[ 8]: .0324601047
-    sh[ 9]: .50945884
-    sh[10]: .0542174838
-    sh[11]: .014903903
-    sh[12]: -.00726825278
-    sh[13]: -.00661443127
-    sh[14]: .0135631151
-    sh[15]: .0174552165
-    sh[16]: -.0202831794
-    sh[17]: .0365316011
-    sh[18]: .557659805
-    sh[19]: .145171121
-    sh[20]: .0191907585
-    sh[21]: -.00936084334
-    sh[22]: -.00842510536
-    sh[23]: .0172748156
-    sh[24]: .0180715658
-    sh[25]: -.0236505568
-    sh[26]: .0357468128
   m_AmbientMode: 0
   m_SkyboxMaterial: {fileID: 2100000, guid: 9d6db3102f0bb4c8db49da5fb18dd92e, type: 2}
   m_HaloStrength: .5
@@ -92,7 +36,6 @@ RenderSettings:
   m_ReflectionBounces: 1
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
-  m_GeneratedSkyboxReflection: {fileID: 0}
   m_Sun: {fileID: 1542135222}
 --- !u!127 &3
 LevelGameManager:
@@ -100,11 +43,9 @@ LevelGameManager:
 --- !u!157 &4
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 4
+  serializedVersion: 5
   m_GIWorkflowMode: 0
-  m_LightmapsModeLegacy: 1
   m_LightmapsMode: 1
-  m_UseDualLightmapsInForward: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -969,14 +910,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22cd43f44031a47e69b646e047dc579d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _exposureTime: 1
-  _velocityFilter: 3
-  _sampleCount: 3
+  _exposureTime: 0
+  _velocityFilter: 1
+  _depthFilter: 0
+  _depthFilterOffset: .00999999978
+  _sampleCount: 1
   _dither: 0
   _debug: 0
   _velocityShader: {fileID: 4800000, guid: 5388fa7d485f64787938aa53ccb91e6e, type: 3}
-  _gaussianShader: {fileID: 4800000, guid: 733a4aab9a8354174a7f71e108659097, type: 3}
-  _reconstructionShader: {fileID: 4800000, guid: 4642a1ce1d5d74fee8a0af9201959415,
+  _filterShader: {fileID: 4800000, guid: 4f4ab7eace8794ab486a3f321e46db78, type: 3}
+  _reconstructionShader: {fileID: 4800000, guid: aca6bb53661944adab5bc45ae3a401e6,
     type: 3}
 --- !u!1 &2068483948
 GameObject:

@@ -90,11 +90,11 @@ public class Kineblur : MonoBehaviour
     #region External Asset References
 
     [SerializeField] Shader _velocityShader;
-    [SerializeField] Shader _gaussianShader;
+    [SerializeField] Shader _filterShader;
     [SerializeField] Shader _reconstructionShader;
 
     // Materials for handling the shaders.
-    Material _gaussianMaterial;
+    Material _filterMaterial;
     Material _reconstructionMaterial;
 
     #endregion
@@ -189,8 +189,8 @@ public class Kineblur : MonoBehaviour
 
     void Start()
     {
-        _gaussianMaterial = new Material(_gaussianShader);
-        _gaussianMaterial.hideFlags = HideFlags.HideAndDontSave;
+        _filterMaterial = new Material(_filterShader);
+        _filterMaterial.hideFlags = HideFlags.HideAndDontSave;
 
         _reconstructionMaterial = new Material(_reconstructionShader);
         _reconstructionMaterial.hideFlags = HideFlags.HideAndDontSave;
@@ -233,7 +233,7 @@ public class Kineblur : MonoBehaviour
         var vcam = _velocityCamera.GetComponent<Camera>();
 
         // Needs a camera depth texture for the depth filter.
-        if (_depthFilter)
+        //if (_depthFilter)
             cam.depthTextureMode |= DepthTextureMode.Depth;
 
         // Recreate the velocity buffer.
@@ -265,54 +265,27 @@ public class Kineblur : MonoBehaviour
 
         UpdateReconstructionMaterial();
 
-        RenderTexture rt1 = null;
-        RenderTexture rt2 = null;
+        int tileDivisor = 31;
 
-        if (_velocityFilter == VelocityFilter.Off)
-        {
-            // Use the velocity buffer directly.
-            _reconstructionMaterial.SetTexture("_VelocityTex", _velocityBuffer);
-        }
-        else
-        {
-            // Get temporary buffers.
-            var ds = GetVelocityDownSampleLevel();
-            var width = _velocityBuffer.width / ds;
-            var height = _velocityBuffer.height / ds;
-            var format = _velocityBuffer.format;
-            rt1 = RenderTexture.GetTemporary(width, height, 0, format);
-            rt2 = RenderTexture.GetTemporary(width, height, 0, format);
+        var tileWidth = _velocityBuffer.width / tileDivisor;
+        var tileHeight = _velocityBuffer.height / tileDivisor;
+        var tileFormat = _velocityBuffer.format;
 
-            if (_velocityFilter == VelocityFilter.Low)
-            {
-                // Apply the gaussian filter without downsampling.
-                Graphics.Blit(_velocityBuffer, rt1, _gaussianMaterial, 1);
-                Graphics.Blit(rt1, rt2, _gaussianMaterial, 2);
-            }
-            else if (_velocityFilter == VelocityFilter.Medium)
-            {
-                // Downsample (1/2) and then apply the gaussian filter.
-                Graphics.Blit(_velocityBuffer, rt2);
-                Graphics.Blit(rt2, rt1, _gaussianMaterial, 1);
-                Graphics.Blit(rt1, rt2, _gaussianMaterial, 2);
-            }
-            else
-            {
-                // Downsample (1/4) and then apply the gaussian filter.
-                Graphics.Blit(_velocityBuffer, rt2, _gaussianMaterial, 0);
-                Graphics.Blit(rt2, rt1, _gaussianMaterial, 1);
-                Graphics.Blit(rt1, rt2, _gaussianMaterial, 2);
-            }
+        RenderTexture tile1 = RenderTexture.GetTemporary(tileWidth, tileHeight, 0, tileFormat);
+        RenderTexture tile2 = RenderTexture.GetTemporary(tileWidth, tileHeight, 0, tileFormat);
 
-            // Use the filtered velocity buffer.
-            _reconstructionMaterial.SetTexture("_VelocityTex", rt2);
-        }
+        tile1.filterMode = FilterMode.Point;
+        tile2.filterMode = FilterMode.Point;
 
-        // Reconstruction.
+        Graphics.Blit(_velocityBuffer, tile1, _filterMaterial, 0);
+        Graphics.Blit(tile1, tile2, _filterMaterial, 1);
+
+        _reconstructionMaterial.SetTexture("_VelocityTex", _velocityBuffer);
+        _reconstructionMaterial.SetTexture("_NeighborMaxTex", tile2);
         Graphics.Blit(source, destination, _reconstructionMaterial, _debug ? 1 : 0);
 
-        if (rt1 != null) RenderTexture.ReleaseTemporary(rt1);
-        if (rt2 != null) RenderTexture.ReleaseTemporary(rt2);
+        RenderTexture.ReleaseTemporary(tile1);
+        RenderTexture.ReleaseTemporary(tile2);
     }
 
     #endregion
