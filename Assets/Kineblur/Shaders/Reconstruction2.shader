@@ -46,22 +46,21 @@ Shader "Hidden/Kineblur/Reconstruction2"
 
     sampler2D_float _CameraDepthTexture;
 
-    static const int sample_count = 12;
+    static const int sample_count = 20;
 
-    float cone(float2 X, float2 Y, float2 V)
+    float cone(float a, float b)
     {
-        return saturate(1.0 - length(X - Y) / length(V));
+        return saturate(1.0 - a * b);
     }
 
-    float cylinder(float2 X, float2 Y, float2 V)
+    float cylinder(float a, float b)
     {
-        float Vl = length(V);
-        return 1.0 - smoothstep(0.95 * Vl, 1.05 * Vl, length(X - Y));
+        return 1.0 - smoothstep(0.95 * b, 1.05 * b, a);
     }
 
-    float soft_depth_compare(float za, float zb)
+    float zcompare(float za, float zb)
     {
-        return saturate(1.0 - (za - zb) / 0.01);
+        return saturate(1.0 - (za - zb) / min(za, zb));
     }
 
     // Reconstruction filter.
@@ -71,38 +70,60 @@ Shader "Hidden/Kineblur/Reconstruction2"
         return frac(sin(dot(uv, float2(12.9898, 78.233))) * 43758.5453);
     }
 
+    float2 rnmix(float2 a, float2 b, float p)
+    {
+        return normalize(lerp(a, b, saturate(p)));
+    }
+
     half4 frag_reconstruction(v2f_img i) : SV_Target
     {
-        float2 X = i.uv;
+        float2 p = i.uv;
 
+        float2 v_max = tex2D(_NeighborMaxTex, p).xy;
 
-        float2 V_X = tex2D(_VelocityTex, X).xy;
-        float2 V_N = tex2D(_NeighborMaxTex, X).xy;
-        float Z_X = -Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, X));
+        float2 w_n = normalize(v_max);
+        float2 v_c = tex2D(_VelocityTex, p).xy;
+        float2 w_p = float2(-w_n.y, w_n.x);
 
-        float weight = min(1.0 / length(V_X), 1);
-        float3 sum = tex2D(_MainTex, i.uv).rgb * weight;
+        if (dot(w_p, v_c) < 0.0) w_p = -w_p;
 
-        float t = -0.5;
+        float2 w_c = rnmix(w_p, normalize(v_c), (length(v_c) - 0.5) / 1.5);
+
+        float totalWeight = min((float)sample_count / (length(v_c) * 40), 1.0);
+        float3 result = tex2D(_MainTex, p) * totalWeight;
+
+        float Z_p = -Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, p));
+
+        float t = -1.0;
         for (int c = 0; c < sample_count; c++)
         {
-            float2 Y = X + V_N * t;
+            float2 d = (fmod(c, 2) < 1) ? v_c : v_max;
+            float T = t * length(v_max);
+            float2 S = t * d + p;
 
-            float2 V_Y = tex2D(_VelocityTex, Y);
-            float Z_Y = -Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, Y));
+            float2 v_S = tex2D(_VelocityTex, S);
+            float3 colorSample = tex2D(_MainTex, S);
 
-            float f = soft_depth_compare(Z_X, Z_Y);
-            float b = soft_depth_compare(Z_Y, Z_X);
+            float Z_S = -Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, S));
 
-            float alpha = f * cone(Y, X, V_Y) + b * cone(X, Y, V_X) + cylinder(Y, X, V_Y) * cylinder(X, Y, V_X) * 2;
+            float f = zcompare(Z_p, Z_S);
+            float b = zcompare(Z_S, Z_p);
 
-            weight += alpha;
-            sum += tex2D(_MainTex, Y).rgb * alpha;
+            float weight = 0.0;
+            float w_A = dot(w_c, d);
+            float w_B = dot(normalize(v_S), d);
 
-            t += 1.0 / sample_count;
+            weight += f * cone(T, 1.0 / length(v_S)) * w_B;
+            weight += b * cone(T, 1.0 / length(v_c)) * w_A;
+            weight += cylinder(T, min(length(v_S), length(v_c))) * max(w_A, w_B) * 2;
+
+            totalWeight += weight;
+            result += colorSample * weight;
+
+            t += 2.0 / sample_count;
         }
 
-        return float4(sum / weight, 1);
+        return float4(result / totalWeight, 1);
     }
 
     // Debug shader (visualizes the velocity buffer).
