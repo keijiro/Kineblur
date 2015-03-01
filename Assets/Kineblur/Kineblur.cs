@@ -265,25 +265,30 @@ public class Kineblur : MonoBehaviour
 
         UpdateReconstructionMaterial();
 
-        int tileDivisor = 31;
+        int tileDivisor = 30;
 
         var tileWidth = _velocityBuffer.width / tileDivisor;
         var tileHeight = _velocityBuffer.height / tileDivisor;
         var tileFormat = _velocityBuffer.format;
 
+        RenderTexture vbuffer = RenderTexture.GetTemporary(_velocityBuffer.width, _velocityBuffer.height, 0, tileFormat);
         RenderTexture tile1 = RenderTexture.GetTemporary(tileWidth, tileHeight, 0, tileFormat);
         RenderTexture tile2 = RenderTexture.GetTemporary(tileWidth, tileHeight, 0, tileFormat);
 
+        source.filterMode = FilterMode.Point;
+        vbuffer.filterMode = FilterMode.Point;
         tile1.filterMode = FilterMode.Point;
         tile2.filterMode = FilterMode.Point;
 
-        Graphics.Blit(_velocityBuffer, tile1, _filterMaterial, 0);
-        Graphics.Blit(tile1, tile2, _filterMaterial, 1);
+        Graphics.Blit(_velocityBuffer, vbuffer, _filterMaterial, 0);
+        Graphics.Blit(vbuffer, tile1, _filterMaterial, 1);
+        Graphics.Blit(tile1, tile2, _filterMaterial, 2);
 
-        _reconstructionMaterial.SetTexture("_VelocityTex", _velocityBuffer);
+        _reconstructionMaterial.SetTexture("_VelocityTex", vbuffer);
         _reconstructionMaterial.SetTexture("_NeighborMaxTex", tile2);
         Graphics.Blit(source, destination, _reconstructionMaterial, _debug ? 1 : 0);
 
+        RenderTexture.ReleaseTemporary(vbuffer);
         RenderTexture.ReleaseTemporary(tile1);
         RenderTexture.ReleaseTemporary(tile2);
     }
