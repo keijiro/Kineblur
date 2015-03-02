@@ -46,7 +46,7 @@ Shader "Hidden/Kineblur/Reconstruction2"
 
     sampler2D_float _CameraDepthTexture;
 
-    static const int sample_count = 32;
+    static const int sample_count = 24;
 
     // Local functions.
 
@@ -88,7 +88,8 @@ Shader "Hidden/Kineblur/Reconstruction2"
         float2 p = i.uv / _MainTex_TexelSize.xy;
         float2 p_uv = i.uv;
 
-        float2 v_max = tex2D(_NeighborMaxTex, p_uv).xy;
+        float2 jitter = float2(nrand(p_uv), nrand(p_uv + float2(2,3))) * _MainTex_TexelSize.xy * 8;
+        float2 v_max = tex2D(_NeighborMaxTex, p_uv + jitter).xy;
 
         float2 w_n = norm(v_max);
         float2 v_c = tex2D(_VelocityTex, p_uv).xy;
