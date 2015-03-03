@@ -77,8 +77,14 @@ Shader "Hidden/Kineblur/Reconstruction2"
         float2 X = i.uv / _MainTex_TexelSize.xy;
         float2 X_uv = i.uv;
 
+        float2 jitter = float2(
+            nrand(X_uv + float2(2, 3)),
+            nrand(X_uv + float2(7, 5))
+        );
+        jitter *= _NeighborMaxTex_TexelSize.xy / 2;
+
         float2 V_X = tex2D(_VelocityTex, X_uv).xy;
-        float2 V_N = tex2D(_NeighborMaxTex, X_uv).xy;
+        float2 V_N = tex2D(_NeighborMaxTex, X_uv + jitter).xy;
         float  Z_X = Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, X_uv));
 
         float l_V_X = length(V_X);
@@ -121,8 +127,7 @@ Shader "Hidden/Kineblur/Reconstruction2"
 
     half4 frag_debug(v2f_img i) : SV_Target
     {
-        //float2 v = tex2D(_VelocityTex, i.uv).xy * 8 + 0.5;
-        float2 v = tex2D(_NeighborMaxTex, i.uv).xy * 8 + 0.5;
+        float2 v = tex2D(_NeighborMaxTex, i.uv).xy / 30 + 0.5;
         return half4(v, 0.5, 1);
     }
 
