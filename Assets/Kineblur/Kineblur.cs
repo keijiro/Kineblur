@@ -269,11 +269,10 @@ public class Kineblur : MonoBehaviour
 
         var tileWidth = _velocityBuffer.width / tileDivisor;
         var tileHeight = _velocityBuffer.height / tileDivisor;
-        var tileFormat = _velocityBuffer.format;
 
-        RenderTexture vbuffer = RenderTexture.GetTemporary(_velocityBuffer.width, _velocityBuffer.height, 0, tileFormat);
-        RenderTexture tile1 = RenderTexture.GetTemporary(tileWidth, tileHeight, 0, tileFormat);
-        RenderTexture tile2 = RenderTexture.GetTemporary(tileWidth, tileHeight, 0, tileFormat);
+        RenderTexture vbuffer = RenderTexture.GetTemporary(_velocityBuffer.width, _velocityBuffer.height, 0, RenderTextureFormat.ARGB2101010);
+        RenderTexture tile1 = RenderTexture.GetTemporary(tileWidth, tileHeight, 0, RenderTextureFormat.RGHalf);
+        RenderTexture tile2 = RenderTexture.GetTemporary(tileWidth, tileHeight, 0, RenderTextureFormat.RGHalf);
 
         source.filterMode = FilterMode.Point;
         vbuffer.filterMode = FilterMode.Point;

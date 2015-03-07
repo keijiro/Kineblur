@@ -44,12 +44,11 @@ Shader "Hidden/Kineblur/Reconstruction2"
     sampler2D _NeighborMaxTex;
     float4 _NeighborMaxTex_TexelSize;
 
-    sampler2D_float _CameraDepthTexture;
-
     // Filter parameters.
     static const int sample_count = 30;
     static const float sample_jitter = 2;
     static const float depth_filter_strength = 5.0;
+    static const float tile_divisor = 30;
 
     // Safer version of vector normalization.
     float2 safe_norm(float2 v)
@@ -99,13 +98,21 @@ Shader "Hidden/Kineblur/Reconstruction2"
         return safe_norm(lerp(a, b, saturate(p)));
     }
 
+    float3 sample_velocity(float2 uv)
+    {
+        float3 v = tex2D(_VelocityTex, uv);
+        return float3((v.xy - 0.5) * 2 * tile_divisor, v.z);
+    }
+
     // Sample weight calculation.
     float sample_weight(float2 d_n, float l_v_c, float z_p, float T, float2 S_uv, float w_A)
     {
-        float2 v_S = tex2D(_VelocityTex, S_uv);
+        float3 temp = tex2D(_VelocityTex, S_uv);
+
+        float2 v_S = (temp.xy - 0.5) * 2 * tile_divisor;
         float l_v_S = max(length(v_S), 0.5);
 
-        float z_S = Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, S_uv));
+        float z_S = temp.z;
 
         float f = zcompare(z_p, z_S);
         float b = zcompare(z_S, z_p);
@@ -127,7 +134,8 @@ Shader "Hidden/Kineblur/Reconstruction2"
         float2 p_uv = i.uv;
 
         // Velocity vector at p.
-        float2 v_c = tex2D(_VelocityTex, p_uv).xy;
+        float3 v_c_t = sample_velocity(p_uv);
+        float2 v_c = v_c_t.xy;
         float2 v_c_n = safe_norm(v_c);
         float l_v_c = max(length(v_c), 0.5);
 
@@ -137,7 +145,7 @@ Shader "Hidden/Kineblur/Reconstruction2"
         float l_v_max = length(v_max);
 
         // Linearized depth at p.
-        float z_p = Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, p_uv));
+        float z_p = v_c_t.z;
 
         // A vector perpendicular to v_max.
         float2 w_p = v_max_n.yx * float2(-1, 1);

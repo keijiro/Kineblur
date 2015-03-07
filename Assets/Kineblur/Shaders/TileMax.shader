@@ -35,6 +35,7 @@ Shader "Hidden/Kineblur/Velocity Filters"
 
     sampler2D _MainTex;
     float4 _MainTex_TexelSize;
+    sampler2D_float _CameraDepthTexture;
 
     // Tile size.
     static const int tile_divisor = 30;
@@ -57,7 +58,9 @@ Shader "Hidden/Kineblur/Velocity Filters"
         half lv = length(v);
         v *= min(lv, tile_divisor) / max(lv, 1e-6);
 
-        return half4(v, 0, 0);
+        float z = Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv));
+
+        return half4(v / tile_divisor * 0.5 + 0.5, z, 0);
     }
 
     // TileMax filter.
@@ -75,7 +78,7 @@ Shader "Hidden/Kineblur/Velocity Filters"
             float2 uv2 = uv;
             for (int iy = 0; iy < tile_divisor; iy++)
             {
-                v = vmax(v, tex2D(_MainTex, uv2).rg);
+                v = vmax(v, (tex2D(_MainTex, uv2).rg - 0.5) * tile_divisor * 2);
                 uv2 += du;
             }
             uv += dv;
