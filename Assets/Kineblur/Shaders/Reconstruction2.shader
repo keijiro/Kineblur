@@ -53,7 +53,7 @@ Shader "Hidden/Kineblur/Reconstruction2"
     // Safer version of vector normalization.
     float2 safe_norm(float2 v)
     {
-        float l = length(v);
+        float l = max(length(v), 1e-6);
         return v / l * step(0.5, l);
     }
 
