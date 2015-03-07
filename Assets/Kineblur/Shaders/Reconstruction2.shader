@@ -46,103 +46,149 @@ Shader "Hidden/Kineblur/Reconstruction2"
 
     sampler2D_float _CameraDepthTexture;
 
-    static const int sample_count = 24;
+    // Filter parameters.
+    static const int sample_count = 30;
+    static const float sample_jitter = 2;
+    static const float depth_filter_strength = 5.0;
 
-    // Local functions.
-
-    float2 norm(float2 v)
+    // Safer version of vector normalization.
+    float2 safe_norm(float2 v)
     {
         float l = length(v);
-        return l > 0.5 ? v / l : float2(0, 0);
+        return v / l * step(0.5, l);
     }
 
-    float nrand(float2 uv)
+    // Interleaved gradient function from CoD AW.
+    // http://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare
+    float gnoise(float2 uv, float2 offs)
     {
-        return frac(sin(dot(uv, float2(12.9898, 78.233))) * 43758.5453);
+        uv = uv / _MainTex_TexelSize.xy + offs;
+        float3 magic = float3(0.06711056, 0.00583715, 52.9829189);
+        return frac(magic.z * frac(dot(uv, magic.xy)));
     }
 
+    // Jitter function for tile lookup.
+    float2 jitter_tile(float2 uv)
+    {
+        float rx, ry;
+        sincos(gnoise(uv, float2(3, 2)) * UNITY_PI * 2, ry, rx);
+        return float2(rx, ry) * _NeighborMaxTex_TexelSize.xy / 4;
+    }
+
+    // Cone shaped interpolation.
     float cone(float T, float l_V)
     {
         return saturate(1.0 - T / l_V);
     }
 
+    // Cylinder shaped interpolation.
     float cylinder(float T, float l_V)
     {
         return 1.0 - smoothstep(0.95 * l_V, 1.05 * l_V, T);
     }
 
+    // Depth comparison function.
     float zcompare(float za, float zb)
     {
-        return saturate(1.0 - 4 * (zb - za) / min(za, zb));
+        return saturate(1.0 - depth_filter_strength * (zb - za) / min(za, zb));
     }
 
+    // Lerp and normalization.
     float2 rnmix(float2 a, float2 b, float p)
     {
-        return norm(lerp(a, b, saturate(p)));
+        return safe_norm(lerp(a, b, saturate(p)));
+    }
+
+    // Sample weight calculation.
+    float sample_weight(float2 d_n, float l_v_c, float z_p, float T, float2 S_uv, float w_A)
+    {
+        float2 v_S = tex2D(_VelocityTex, S_uv);
+        float l_v_S = max(length(v_S), 0.5);
+
+        float z_S = Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, S_uv));
+
+        float f = zcompare(z_p, z_S);
+        float b = zcompare(z_S, z_p);
+
+        float w_B = abs(dot(v_S / l_v_S, d_n));
+
+        float weight = 0.0;
+        weight += f * cone(T, l_v_S) * w_B;
+        weight += b * cone(T, l_v_c) * w_A;
+        weight += cylinder(T, min(l_v_S, l_v_c)) * max(w_A, w_B) * 2;
+
+        return weight;
     }
 
     // Reconstruction filter.
-
     half4 frag_reconstruction(v2f_img i) : SV_Target
     {
         float2 p = i.uv / _MainTex_TexelSize.xy;
         float2 p_uv = i.uv;
 
-        float2 jitter = float2(nrand(p_uv), nrand(p_uv + float2(2,3))) * _MainTex_TexelSize.xy * 8;
-        float2 v_max = tex2D(_NeighborMaxTex, p_uv + jitter).xy;
-
-        float2 w_n = norm(v_max);
+        // Velocity vector at p.
         float2 v_c = tex2D(_VelocityTex, p_uv).xy;
-        float2 w_p = float2(-w_n.y, w_n.x);
+        float2 v_c_n = safe_norm(v_c);
+        float l_v_c = max(length(v_c), 0.5);
 
+        // Nightbor-max vector at p with small jitter.
+        float2 v_max = tex2D(_NeighborMaxTex, p_uv + jitter_tile(p_uv)).xy;
+        float2 v_max_n = safe_norm(v_max);
+        float l_v_max = length(v_max);
+
+        // Linearized depth at p.
+        float z_p = Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, p_uv));
+
+        // A vector perpendicular to v_max.
+        float2 w_p = v_max_n.yx * float2(-1, 1);
         if (dot(w_p, v_c) < 0.0) w_p = -w_p;
 
-        float2 w_c = rnmix(w_p, norm(v_c), (length(v_c) - 0.5) / 1.5);
+        // Alternative sampling direction.
+        float2 w_c = rnmix(w_p, v_c_n, (l_v_c - 0.5) / 1.5);
 
-        float totalWeight = (float)sample_count / (max(length(v_c), 0.5) * 40);
+        // First itegration sample (center sample).
+        float totalWeight = (float)sample_count / (l_v_c * 40);
         float3 result = tex2D(_MainTex, p_uv) * totalWeight;
 
-        float Z_p = Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, p_uv));
+        // Start from t = -1 with small jitter.
+        float t = -1.0 + gnoise(p_uv, 0) * sample_jitter / (sample_count + sample_jitter);
+        float dt = 2.0 / (sample_count + sample_jitter);
 
-        float t = -1.0 + nrand(p_uv) / (sample_count + 1);
-        for (int c = 0; c < sample_count; c++)
+        // Precalc the w_A parameters.
+        float w_A1 = dot(w_c, v_c_n);
+        float w_A2 = dot(w_c, v_max_n);
+
+        for (int c = 0; c < sample_count / 2; c++)
         {
-            float2 d = (fmod(c, 2) < 1) ? v_c : v_max;
-            float T = abs(t * length(v_max));
-            float2 S = t * d + p;
-            float2 S_uv = S * _MainTex_TexelSize.xy;
+            // Odd-numbered sample: sample along v_c.
+            {
+                float2 S_uv = (t * v_c + p) * _MainTex_TexelSize.xy;
+                float weight = sample_weight(v_c_n, l_v_c, z_p, abs(t * l_v_max), S_uv, w_A1);
 
-            float2 v_S = tex2D(_VelocityTex, S_uv);
-            float3 colorSample = tex2D(_MainTex, S_uv);
+                result += tex2D(_MainTex, S_uv).rgb * weight;
+                totalWeight += weight;
 
-            float Z_S = Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, S_uv));
+                t += dt;
+            }
+            // Even-numbered sample: sample along v_max.
+            {
+                float2 S_uv = (t * v_max + p) * _MainTex_TexelSize.xy;
+                float weight = sample_weight(v_max_n, l_v_c, z_p, abs(t * l_v_max), S_uv, w_A2);
 
-            float f = zcompare(Z_p, Z_S);
-            float b = zcompare(Z_S, Z_p);
+                result += tex2D(_MainTex, S_uv).rgb * weight;
+                totalWeight += weight;
 
-            float w_A = abs(dot(w_c, norm(d)));
-            float w_B = abs(dot(norm(v_S), norm(d)));
-
-            float weight = 0.0;
-            weight += f * cone(T, length(v_S) + 1e-6) * w_B;
-            weight += b * cone(T, length(v_c) + 1e-6) * w_A;
-            weight += cylinder(T, min(length(v_S), length(v_c))) * max(w_A, w_B) * 2;
-
-            totalWeight += weight;
-            result += colorSample * weight;
-
-            t += 2.0 / (sample_count + 1);
+                t += dt;
+            }
         }
 
         return float4(result / totalWeight, 1);
     }
 
     // Debug shader (visualizes the velocity buffer).
-
     half4 frag_debug(v2f_img i) : SV_Target
     {
-        //float2 v = tex2D(_VelocityTex, i.uv).xy * 8 + 0.5;
-        float2 v = tex2D(_NeighborMaxTex, i.uv).xy * 8 + 0.5;
+        float2 v = tex2D(_NeighborMaxTex, i.uv).xy / 30 + 0.5;
         return half4(v, 0.5, 1);
     }
 

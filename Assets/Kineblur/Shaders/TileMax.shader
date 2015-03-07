@@ -87,6 +87,8 @@ Shader "Hidden/Kineblur/Velocity Filters"
     // NeighborMax filter.
     half4 frag_neighbor_max(v2f_img i) : SV_Target
     {
+        static const half cw = 1.01f; // center weight tweak
+
         half2 tx = _MainTex_TexelSize.xy;
 
         half2 v1 = tex2D(_MainTex, i.uv + tx * half2(-1, -1)).rg;
@@ -94,7 +96,7 @@ Shader "Hidden/Kineblur/Velocity Filters"
         half2 v3 = tex2D(_MainTex, i.uv + tx * half2(+1, -1)).rg;
 
         half2 v4 = tex2D(_MainTex, i.uv + tx * half2(-1,  0)).rg;
-        half2 v5 = tex2D(_MainTex, i.uv + tx * half2( 0,  0)).rg;
+        half2 v5 = tex2D(_MainTex, i.uv + tx * half2( 0,  0)).rg * cw;
         half2 v6 = tex2D(_MainTex, i.uv + tx * half2(+1,  0)).rg;
 
         half2 v7 = tex2D(_MainTex, i.uv + tx * half2(-1, +1)).rg;
@@ -105,7 +107,7 @@ Shader "Hidden/Kineblur/Velocity Filters"
         half2 vb = vmax(v4, vmax(v5, v6));
         half2 vc = vmax(v7, vmax(v8, v9));
 
-        return half4(vmax(va, vmax(vb, vc)), 0, 0);
+        return half4(vmax(va, vmax(vb, vc)) / cw, 0, 0);
     }
 
     ENDCG 
