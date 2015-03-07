@@ -41,45 +41,14 @@ public class Kineblur : MonoBehaviour
         set { _exposureTime = value; }
     }
 
-    // Velocity buffer filter.
-    public enum VelocityFilter { Off, Low, Medium, High }
-
-    [SerializeField] VelocityFilter _velocityFilter = VelocityFilter.Low;
-
-    public VelocityFilter velocityFilter {
-        get { return _velocityFilter; }
-        set { _velocityFilter = value; }
-    }
-
-    // Depth filter.
-    [SerializeField] bool _depthFilter = false;
-    [SerializeField] float _depthFilterOffset = 0.01f;
-
-    public bool depthFilter {
-        get { return _depthFilter; }
-        set { _depthFilter = value; }
-    }
-    public float depthFilterOffset {
-        get { return _depthFilterOffset; }
-        set { _depthFilterOffset = value; }
-    }
-
     // Sample count.
-    public enum SampleCount { Low, Medium, High, UltraHigh }
+    public enum SampleCount { Low, Medium, High }
 
     [SerializeField] SampleCount _sampleCount = SampleCount.Medium;
 
     public SampleCount sampleCount {
         get { return _sampleCount; }
         set { _sampleCount = value; }
-    }
-
-    // Dithering.
-    [SerializeField] bool _dither;
-
-    public bool dither {
-        get { return _dither; }
-        set { _dither = value; }
     }
 
     // Debug display (exposed only to Editor).
@@ -125,52 +94,23 @@ public class Kineblur : MonoBehaviour
         return P * V;
     }
 
-    int GetVelocityDownSampleLevel()
-    {
-        if (_velocityFilter == VelocityFilter.Medium) return 2;
-        if (_velocityFilter == VelocityFilter.High) return 4;
-        return 1;
-    }
-
     void UpdateReconstructionMaterial()
     {
-        if (_depthFilter)
-        {
-            _reconstructionMaterial.EnableKeyword("DEPTH_FILTER_ON");
-            _reconstructionMaterial.SetFloat("_DepthFilterOffset", _depthFilterOffset);
-        }
-        else
-            _reconstructionMaterial.DisableKeyword("DEPTH_FILTER_ON");
-
         if (_sampleCount == SampleCount.Low)
         {
             _reconstructionMaterial.DisableKeyword("QUALITY_MEDIUM");
             _reconstructionMaterial.DisableKeyword("QUALITY_HIGH");
-            _reconstructionMaterial.DisableKeyword("QUALITY_SUPER");
         }
         else if (_sampleCount == SampleCount.Medium)
         {
             _reconstructionMaterial.EnableKeyword("QUALITY_MEDIUM");
             _reconstructionMaterial.DisableKeyword("QUALITY_HIGH");
-            _reconstructionMaterial.DisableKeyword("QUALITY_SUPER");
         }
-        else if (_sampleCount == SampleCount.Medium)
+        else
         {
             _reconstructionMaterial.DisableKeyword("QUALITY_MEDIUM");
             _reconstructionMaterial.EnableKeyword("QUALITY_HIGH");
-            _reconstructionMaterial.DisableKeyword("QUALITY_SUPER");
         }
-        else
-        {
-            _reconstructionMaterial.DisableKeyword("QUALITY_MEDIUM");
-            _reconstructionMaterial.DisableKeyword("QUALITY_HIGH");
-            _reconstructionMaterial.EnableKeyword("QUALITY_SUPER");
-        }
-
-        if (_dither)
-            _reconstructionMaterial.EnableKeyword("DITHER_ON");
-        else
-            _reconstructionMaterial.DisableKeyword("DITHER_ON");
 
         if (_exposureTime == 0)
         {
@@ -266,7 +206,6 @@ public class Kineblur : MonoBehaviour
         UpdateReconstructionMaterial();
 
         int tileDivisor = 30;
-
         var tileWidth = _velocityBuffer.width / tileDivisor;
         var tileHeight = _velocityBuffer.height / tileDivisor;
 

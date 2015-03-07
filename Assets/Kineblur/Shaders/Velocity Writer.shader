@@ -22,7 +22,7 @@
 //
 
 // Velocity writer.
-Shader "Hidden/Kineblur/Velocity"
+Shader "Hidden/Kineblur/Velocity Writer"
 {
     CGINCLUDE
 

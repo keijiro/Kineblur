@@ -911,11 +911,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _exposureTime: 0
-  _velocityFilter: 1
-  _depthFilter: 0
-  _depthFilterOffset: .00999999978
   _sampleCount: 1
-  _dither: 0
   _debug: 0
   _velocityShader: {fileID: 4800000, guid: 5388fa7d485f64787938aa53ccb91e6e, type: 3}
   _filterShader: {fileID: 4800000, guid: 4f4ab7eace8794ab486a3f321e46db78, type: 3}
