@@ -22,6 +22,7 @@
 //
 
 using UnityEngine;
+using UnityEngine.Rendering;
 using System.Collections;
 
 [AddComponentMenu("Kineblur/Kineblur")]
@@ -59,10 +60,13 @@ public class Kineblur : MonoBehaviour
     #region External Asset References
 
     [SerializeField] Shader _velocityShader;
+    [SerializeField] Shader _backgroundShader;
+    [SerializeField] Mesh _backgroundMesh;
     [SerializeField] Shader _filterShader;
     [SerializeField] Shader _reconstructionShader;
 
     // Materials for handling the shaders.
+    Material _backgroundMaterial;
     Material _filterMaterial;
     Material _reconstructionMaterial;
 
@@ -92,6 +96,24 @@ public class Kineblur : MonoBehaviour
         Matrix4x4 V = cam.worldToCameraMatrix;
         Matrix4x4 P = GL.GetGPUProjectionMatrix(cam.projectionMatrix, true);
         return P * V;
+    }
+
+    void SetUpResources()
+    {
+        if (_backgroundMaterial == null) {
+            _backgroundMaterial = new Material(_backgroundShader);
+            _backgroundMaterial.hideFlags = HideFlags.HideAndDontSave;
+        }
+
+        if (_filterMaterial == null) {
+            _filterMaterial = new Material(_filterShader);
+            _filterMaterial.hideFlags = HideFlags.HideAndDontSave;
+        }
+
+        if (_reconstructionMaterial == null) {
+            _reconstructionMaterial = new Material(_reconstructionShader);
+            _reconstructionMaterial.hideFlags = HideFlags.HideAndDontSave;
+        }
     }
 
     void UpdateReconstructionMaterial()
@@ -129,12 +151,6 @@ public class Kineblur : MonoBehaviour
 
     void Start()
     {
-        _filterMaterial = new Material(_filterShader);
-        _filterMaterial.hideFlags = HideFlags.HideAndDontSave;
-
-        _reconstructionMaterial = new Material(_reconstructionShader);
-        _reconstructionMaterial.hideFlags = HideFlags.HideAndDontSave;
-
         _previousVPMatrix = CalculateVPMatrix();
 
         // Default velocity writer matrix for static objects.
@@ -145,10 +161,21 @@ public class Kineblur : MonoBehaviour
     {
         if (_velocityCamera == null)
         {
+            SetUpResources();
+
             // Make a velocity camera instance.
             _velocityCamera = new GameObject("Velocity Camera", typeof(Camera));
             _velocityCamera.hideFlags = HideFlags.HideAndDontSave;
-            _velocityCamera.GetComponent<Camera>().enabled = false;
+
+            // Make a command buffer for writing background velocity.
+            var cmd = new CommandBuffer();
+            cmd.name = "Background Velocity";
+            cmd.DrawMesh(_backgroundMesh, Matrix4x4.identity, _backgroundMaterial);
+
+            // Set up the velocity camera.
+            var cam = _velocityCamera.GetComponent<Camera>();
+            cam.enabled = false;
+            cam.AddCommandBuffer(CameraEvent.AfterForwardOpaque, cmd);
         }
     }
 
