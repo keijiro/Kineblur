@@ -63,6 +63,7 @@ Shader "Hidden/Kineblur/Velocity Writer"
 
     SubShader
     {
+        Tags { "RenderType"="Opaque" }
         Pass
         {
             Fog { Mode off }      

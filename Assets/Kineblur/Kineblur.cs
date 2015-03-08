@@ -190,9 +190,10 @@ public class Kineblur : MonoBehaviour
         // Reset the velocity camera and request rendering.
         vcam.CopyFrom(cam);
         vcam.clearFlags = CameraClearFlags.SolidColor;
+        vcam.depthTextureMode = DepthTextureMode.None;
         vcam.backgroundColor = Color.black;
         vcam.targetTexture = _velocityBuffer;
-        vcam.RenderWithShader(_velocityShader, null);
+        vcam.RenderWithShader(_velocityShader, "RenderType");
     }
 
     void OnRenderImage(RenderTexture source, RenderTexture destination)
