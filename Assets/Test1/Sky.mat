@@ -18,7 +18,7 @@ Material:
         first:
           name: _Tex
         second:
-          m_Texture: {fileID: 8900000, guid: 2df631f6c16964e39a4097e5f1d9b082, type: 3}
+          m_Texture: {fileID: 8900000, guid: 3402db7323de64b2f85e3800d0a924fe, type: 3}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
     m_Floats:
@@ -29,7 +29,7 @@ Material:
       data:
         first:
           name: _Rotation
-        second: 211
+        second: 180
     m_Colors:
       data:
         first:
