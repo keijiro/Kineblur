@@ -14,10 +14,10 @@ SceneSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 6
-  m_Fog: 1
+  m_Fog: 0
   m_FogColor: {r: .5, g: .5, b: .5, a: 1}
   m_FogMode: 3
-  m_FogDensity: .0399999991
+  m_FogDensity: .00999999978
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: .211999997, g: .226999998, b: .259000003, a: 1}
@@ -211,6 +211,7 @@ GameObject:
   - 114: {fileID: 911810770}
   - 114: {fileID: 911810769}
   - 114: {fileID: 911810768}
+  - 114: {fileID: 911810772}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -294,23 +295,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10593b7d510b64560a297a8af1356dcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _colorTemp: .0900000036
-  _colorTint: .0399999991
+  _colorTemp: .600000024
+  _colorTint: .100000001
   _toneMapping: 1
-  _exposure: .839999974
-  _saturation: 1.16999996
+  _exposure: 2
+  _saturation: 1.02999997
   _rCurve:
     serializedVersion: 2
     m_Curve:
     - time: 0
       value: 0
-      inSlope: .42663011
-      outSlope: .42663011
+      inSlope: .833333254
+      outSlope: .833333254
       tangentMode: 0
     - time: 1
       value: 1
-      inSlope: .596465886
-      outSlope: .596465886
+      inSlope: .975000381
+      outSlope: .975000381
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -319,14 +320,14 @@ MonoBehaviour:
     m_Curve:
     - time: 0
       value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 10
+      inSlope: 1.09374988
+      outSlope: 1.09374988
+      tangentMode: 0
     - time: 1
       value: 1
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 10
+      inSlope: 1.03125083
+      outSlope: 1.03125083
+      tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
   _bCurve:
@@ -334,28 +335,28 @@ MonoBehaviour:
     m_Curve:
     - time: 0
       value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 10
+      inSlope: .68749994
+      outSlope: .68749994
+      tangentMode: 0
     - time: 1
       value: 1
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 10
+      inSlope: .951219916
+      outSlope: .951219916
+      tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
   _cCurve:
     serializedVersion: 2
     m_Curve:
-    - time: -.0218340605
-      value: -.0479999967
-      inSlope: .436096221
-      outSlope: .436096221
+    - time: .100000001
+      value: 0
+      inSlope: 1.14473665
+      outSlope: 1.14473665
       tangentMode: 0
-    - time: 1.00655019
-      value: 1.176
-      inSlope: .708654106
-      outSlope: .708654106
+    - time: 1
+      value: 1
+      inSlope: .800000489
+      outSlope: .800000489
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -393,7 +394,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mode: 1
-  intensity: 3.4000001
+  intensity: 4
   chromaticAberration: 7
   axialAberration: 2
   blur: 0
@@ -442,6 +443,20 @@ MonoBehaviour:
   blurAndFlaresShader: {fileID: 4800000, guid: be6e39cf196f146d5be72fbefb18ed75, type: 3}
   brightPassFilterShader: {fileID: 4800000, guid: 0aeaa4cb29f5d4e9c8455f04c8575c8c,
     type: 3}
+--- !u!114 &911810772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 911810762}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac62412c354194257a4027b9c2623df6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  framerate: 30
+  superSize: 0
+  autoRecord: 1
 --- !u!1 &1297636758
 GameObject:
   m_ObjectHideFlags: 0
@@ -688,7 +703,7 @@ Light:
   serializedVersion: 6
   m_Type: 1
   m_Color: {r: 1, g: .956862748, b: .839215696, a: 1}
-  m_Intensity: 1.20000005
+  m_Intensity: .699999988
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
@@ -716,7 +731,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1876862181}
-  m_LocalRotation: {x: .408217937, y: -.234569728, z: .109381676, w: .875426054}
+  m_LocalRotation: {x: -.230354071, y: .613037288, z: -.193289936, w: -.730589747}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []

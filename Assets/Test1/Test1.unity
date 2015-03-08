@@ -784,7 +784,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   framerate: 30
-  superSize: 2
+  superSize: 0
   autoRecord: 1
 --- !u!114 &1679973247
 MonoBehaviour:
