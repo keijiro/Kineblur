@@ -138,12 +138,12 @@ public class Kineblur : MonoBehaviour
 
         if (_exposureTime == 0)
         {
-            _reconstructionMaterial.SetFloat("_VelocityScale", 1);
+            _filterMaterial.SetFloat("_VelocityScale", 1);
         }
         else
         {
             var s = Time.smoothDeltaTime * exposureTimeTable[(int)_exposureTime];
-            _reconstructionMaterial.SetFloat("_VelocityScale", 1.0f / s);
+            _filterMaterial.SetFloat("_VelocityScale", 1.0f / s);
         }
     }
 

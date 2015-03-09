@@ -37,6 +37,8 @@ Shader "Hidden/Kineblur/Velocity Filters"
     float4 _MainTex_TexelSize;
     sampler2D_float _CameraDepthTexture;
 
+    float _VelocityScale;
+
     // Tile size.
     static const int tile_divisor = 30;
 
@@ -50,6 +52,8 @@ Shader "Hidden/Kineblur/Velocity Filters"
     half4 frag_rescale(v2f_img i) : SV_Target
     {
         half2 v = tex2D(_MainTex, i.uv);
+
+        v *= _VelocityScale;
 
         // Scale the velocity vector into pixel unit.
         v /= _MainTex_TexelSize.xy;
