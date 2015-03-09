@@ -30,9 +30,9 @@ public class KineblurEditor : Editor
 {
     SerializedProperty propExposureTime;
     SerializedProperty propSampleCount;
-    SerializedProperty propDebug;
+    SerializedProperty propVisualization;
 
-    GUIContent labelDebug;
+    GUIContent labelVisualization;
 
     static int[] exposureOptions = { 0, 1, 2, 3, 4 };
 
@@ -48,8 +48,8 @@ public class KineblurEditor : Editor
     {
         propExposureTime = serializedObject.FindProperty("_exposureTime");
         propSampleCount = serializedObject.FindProperty("_sampleCount");
-        propDebug = serializedObject.FindProperty("_debug");
-        labelDebug = new GUIContent("Visualize Velocity");
+        propVisualization = serializedObject.FindProperty("_visualization");
+        labelVisualization = new GUIContent("Visualize (debug)");
     }
 
     public override void OnInspectorGUI()
@@ -57,7 +57,7 @@ public class KineblurEditor : Editor
         serializedObject.Update();
         EditorGUILayout.IntPopup(propExposureTime, exposureOptionLabels, exposureOptions);
         EditorGUILayout.PropertyField(propSampleCount);
-        EditorGUILayout.PropertyField(propDebug, labelDebug);
+        EditorGUILayout.PropertyField(propVisualization, labelVisualization);
         serializedObject.ApplyModifiedProperties();
     }
 }

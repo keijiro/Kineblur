@@ -52,8 +52,10 @@ public class Kineblur : MonoBehaviour
         set { _sampleCount = value; }
     }
 
-    // Debug display (exposed only to Editor).
-    [SerializeField] bool _debug;
+    // Visualization mode (exposed only to Editor).
+    public enum Visualization { Off, Velocity, NeighborMax }
+
+    [SerializeField] Visualization _visualization;
 
     #endregion
 
@@ -252,7 +254,7 @@ public class Kineblur : MonoBehaviour
 
         _reconstructionMaterial.SetTexture("_VelocityTex", vbuffer);
         _reconstructionMaterial.SetTexture("_NeighborMaxTex", tile2);
-        Graphics.Blit(source, destination, _reconstructionMaterial, _debug ? 1 : 0);
+        Graphics.Blit(source, destination, _reconstructionMaterial, (int)_visualization);
 
         RenderTexture.ReleaseTemporary(vbuffer);
         RenderTexture.ReleaseTemporary(tile1);

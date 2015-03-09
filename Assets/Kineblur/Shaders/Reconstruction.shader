@@ -193,8 +193,13 @@ Shader "Hidden/Kineblur/Reconstruction"
         return float4(result / totalWeight, 1);
     }
 
-    // Debug shader (visualizes the velocity buffer).
-    half4 frag_debug(v2f_img i) : SV_Target
+    // Debug shader (visualizes the velocity buffers).
+    half4 frag_velocity(v2f_img i) : SV_Target
+    {
+        float2 v = tex2D(_VelocityTex, i.uv).xy;
+        return half4(v, 0.5, 1);
+    }
+    half4 frag_neighbormax(v2f_img i) : SV_Target
     {
         float2 v = tex2D(_NeighborMaxTex, i.uv).xy / 30 + 0.5;
         return half4(v, 0.5, 1);
@@ -221,7 +226,16 @@ Shader "Hidden/Kineblur/Reconstruction"
             Fog { Mode off }      
             CGPROGRAM
             #pragma vertex vert_img
-            #pragma fragment frag_debug
+            #pragma fragment frag_velocity
+            ENDCG
+        }
+        Pass
+        {
+            ZTest Always Cull Off ZWrite Off
+            Fog { Mode off }      
+            CGPROGRAM
+            #pragma vertex vert_img
+            #pragma fragment frag_neighbormax
             ENDCG
         }
     }
