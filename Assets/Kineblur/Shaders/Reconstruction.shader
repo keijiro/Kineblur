@@ -33,6 +33,8 @@ Shader "Hidden/Kineblur/Reconstruction"
 
     CGINCLUDE
 
+    #pragma multi_compile QUALITY_LOW QUALITY_MEDIUM QUALITY_HIGH
+
     #include "UnityCG.cginc"
 
     sampler2D _MainTex;
@@ -45,10 +47,17 @@ Shader "Hidden/Kineblur/Reconstruction"
     float4 _NeighborMaxTex_TexelSize;
 
     // Filter parameters.
-    static const int sample_count = 30;
     static const float sample_jitter = 2;
     static const float depth_filter_strength = 5.0;
     static const float tile_divisor = 30;
+
+    #if QUALITY_HIGH
+    static const int sample_count = 30;
+    #elif QUALITY_MEDIUM
+    static const int sample_count = 20;
+    #else
+    static const int sample_count = 10;
+    #endif
 
     // Safer version of vector normalization.
     float2 safe_norm(float2 v)
