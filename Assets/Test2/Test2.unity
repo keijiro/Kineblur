@@ -373,9 +373,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22cd43f44031a47e69b646e047dc579d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _exposureTime: 0
-  _sampleCount: 1
-  _debug: 0
+  _exposureTime: 2
+  _sampleCount: 2
+  _depthFilter: 8
+  _visualization: 0
   _velocityShader: {fileID: 4800000, guid: 5388fa7d485f64787938aa53ccb91e6e, type: 3}
   _backgroundShader: {fileID: 4800000, guid: aac9e5bff93f949b9bd57ed2d127e8cd, type: 3}
   _backgroundMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}

@@ -52,6 +52,14 @@ public class Kineblur : MonoBehaviour
         set { _sampleCount = value; }
     }
 
+    // Depth filter strength.
+    [SerializeField] float _depthFilter = 5;
+
+    public float depthFilter {
+        get { return _depthFilter; }
+        set { _depthFilter = value; }
+    }
+
     // Visualization mode (exposed only to Editor).
     public enum Visualization { Off, Velocity, NeighborMax }
 
@@ -145,6 +153,11 @@ public class Kineblur : MonoBehaviour
             var s = Time.smoothDeltaTime * exposureTimeTable[(int)_exposureTime];
             _filterMaterial.SetFloat("_VelocityScale", 1.0f / s);
         }
+
+        _filterMaterial.SetFloat("_MaxBlurRadius", 40);
+        _reconstructionMaterial.SetFloat("_MaxBlurRadius", 40);
+
+        _reconstructionMaterial.SetFloat("_DepthFilterStrength", _depthFilter);
     }
 
     #endregion
@@ -235,30 +248,33 @@ public class Kineblur : MonoBehaviour
 
         UpdateReconstructionMaterial();
 
-        int tileDivisor = 30;
-        var tileWidth = _velocityBuffer.width / tileDivisor;
-        var tileHeight = _velocityBuffer.height / tileDivisor;
+        var tw = _velocityBuffer.width;
+        var th = _velocityBuffer.height;
 
-        RenderTexture vbuffer = RenderTexture.GetTemporary(_velocityBuffer.width, _velocityBuffer.height, 0, RenderTextureFormat.ARGB2101010);
-        RenderTexture tile1 = RenderTexture.GetTemporary(tileWidth, tileHeight, 0, RenderTextureFormat.RGHalf);
-        RenderTexture tile2 = RenderTexture.GetTemporary(tileWidth, tileHeight, 0, RenderTextureFormat.RGHalf);
+        RenderTexture vbuffer = RenderTexture.GetTemporary(tw, th, 0, RenderTextureFormat.ARGB2101010);
+        RenderTexture tile1 = RenderTexture.GetTemporary(tw / 10, th / 10, 0, RenderTextureFormat.RGHalf);
+        RenderTexture tile2 = RenderTexture.GetTemporary(tw / 40, th / 40, 0, RenderTextureFormat.RGHalf);
+        RenderTexture tile3 = RenderTexture.GetTemporary(tw / 40, th / 40, 0, RenderTextureFormat.RGHalf);
 
         source.filterMode = FilterMode.Point;
         vbuffer.filterMode = FilterMode.Point;
         tile1.filterMode = FilterMode.Point;
         tile2.filterMode = FilterMode.Point;
+        tile3.filterMode = FilterMode.Point;
 
         Graphics.Blit(_velocityBuffer, vbuffer, _filterMaterial, 0);
         Graphics.Blit(vbuffer, tile1, _filterMaterial, 1);
         Graphics.Blit(tile1, tile2, _filterMaterial, 2);
+        Graphics.Blit(tile2, tile3, _filterMaterial, 4);
 
         _reconstructionMaterial.SetTexture("_VelocityTex", vbuffer);
-        _reconstructionMaterial.SetTexture("_NeighborMaxTex", tile2);
+        _reconstructionMaterial.SetTexture("_NeighborMaxTex", tile3);
         Graphics.Blit(source, destination, _reconstructionMaterial, (int)_visualization);
 
         RenderTexture.ReleaseTemporary(vbuffer);
         RenderTexture.ReleaseTemporary(tile1);
         RenderTexture.ReleaseTemporary(tile2);
+        RenderTexture.ReleaseTemporary(tile3);
     }
 
     #endregion

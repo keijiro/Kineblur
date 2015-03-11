@@ -46,10 +46,12 @@ Shader "Hidden/Kineblur/Reconstruction"
     sampler2D _NeighborMaxTex;
     float4 _NeighborMaxTex_TexelSize;
 
-    // Filter parameters.
+    // Filter variables.
+    float _MaxBlurRadius;
+    float _DepthFilterStrength;
+
+    // Filter coefficients.
     static const float sample_jitter = 2;
-    static const float depth_filter_strength = 5.0;
-    static const float tile_divisor = 30;
 
     #if QUALITY_HIGH
     static const int sample_count = 30;
@@ -98,7 +100,7 @@ Shader "Hidden/Kineblur/Reconstruction"
     // Depth comparison function.
     float zcompare(float za, float zb)
     {
-        return saturate(1.0 - depth_filter_strength * (zb - za) / min(za, zb));
+        return saturate(1.0 - _DepthFilterStrength * (zb - za) / min(za, zb));
     }
 
     // Lerp and normalization.
@@ -110,7 +112,7 @@ Shader "Hidden/Kineblur/Reconstruction"
     float3 sample_velocity(float2 uv)
     {
         float3 v = tex2D(_VelocityTex, uv);
-        return float3((v.xy - 0.5) * 2 * tile_divisor, v.z);
+        return float3((v.xy * 2 - 1) * _MaxBlurRadius, v.z);
     }
 
     // Sample weight calculation.
@@ -118,7 +120,7 @@ Shader "Hidden/Kineblur/Reconstruction"
     {
         float3 temp = tex2D(_VelocityTex, S_uv);
 
-        float2 v_S = (temp.xy - 0.5) * 2 * tile_divisor;
+        float2 v_S = (temp.xy * 2 - 1) * _MaxBlurRadius;
         float l_v_S = max(length(v_S), 0.5);
 
         float z_S = temp.z;
@@ -205,12 +207,14 @@ Shader "Hidden/Kineblur/Reconstruction"
     // Debug shader (visualizes the velocity buffers).
     half4 frag_velocity(v2f_img i) : SV_Target
     {
-        float2 v = tex2D(_VelocityTex, i.uv).xy;
+        half2 v = tex2D(_VelocityTex, i.uv).xy;
         return half4(v, 0.5, 1);
     }
+
     half4 frag_neighbormax(v2f_img i) : SV_Target
     {
-        float2 v = tex2D(_NeighborMaxTex, i.uv).xy / 30 + 0.5;
+        half2 v = tex2D(_NeighborMaxTex, i.uv).xy;
+        v = (v / _MaxBlurRadius + 1) / 2;
         return half4(v, 0.5, 1);
     }
 

@@ -57,7 +57,7 @@ Shader "Hidden/Kineblur/Background Velocity Writer"
     {
         float2 p1 = i.coord1.xy / i.coord1.w;
         float2 p2 = i.coord2.xy / i.coord2.w;
-        return (p2 - p1) / 2;
+        return p2 - p1;
     }
 
     ENDCG

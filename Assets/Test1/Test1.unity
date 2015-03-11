@@ -880,6 +880,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _exposureTime: 2
   _sampleCount: 2
+  _depthFilter: 5
   _visualization: 0
   _velocityShader: {fileID: 4800000, guid: 5388fa7d485f64787938aa53ccb91e6e, type: 3}
   _backgroundShader: {fileID: 4800000, guid: aac9e5bff93f949b9bd57ed2d127e8cd, type: 3}
