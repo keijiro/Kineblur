@@ -38,9 +38,6 @@ Shader "Hidden/Kineblur/Velocity Filters"
 
     sampler2D_float _CameraDepthTexture;
 
-    // Velocity scale factor (used for exposure time control).
-    float _VelocityScale;
-
     // Maximum blur radius.
     float _MaxBlurRadius;
 
@@ -55,9 +52,8 @@ Shader "Hidden/Kineblur/Velocity Filters"
     {
         float2 v = tex2D(_MainTex, i.uv);
 
-        // Halve the velocity, apply the exposure time
-        // and convert to the one-unit-per-pixel scale.
-        v = v * 0.5 * _VelocityScale / _MainTex_TexelSize.xy;
+        // Halve the velocity and convert to the one-unit-per-pixel scale.
+        v = v * 0.5 / _MainTex_TexelSize.xy;
 
         // Clamp the vector with the maximum blur radius.
         float lv = length(v);

@@ -144,16 +144,6 @@ public class Kineblur : MonoBehaviour
             _reconstructionMaterial.EnableKeyword("QUALITY_HIGH");
         }
 
-        if (_exposureTime == 0)
-        {
-            _filterMaterial.SetFloat("_VelocityScale", 1);
-        }
-        else
-        {
-            var s = Time.smoothDeltaTime * exposureTimeTable[(int)_exposureTime];
-            _filterMaterial.SetFloat("_VelocityScale", 1.0f / s);
-        }
-
         _filterMaterial.SetFloat("_MaxBlurRadius", 40);
         _reconstructionMaterial.SetFloat("_MaxBlurRadius", 40);
 
@@ -207,6 +197,17 @@ public class Kineblur : MonoBehaviour
 
         // Store the current VP matrix.
         _previousVPMatrix = CalculateVPMatrix();
+
+        // Set the exposure time as a velocity scale.
+        if (_exposureTime == 0)
+        {
+            Shader.SetGlobalFloat("_KineblurVelocityScale", 1);
+        }
+        else
+        {
+            var s = Time.smoothDeltaTime * exposureTimeTable[(int)_exposureTime];
+            Shader.SetGlobalFloat("_KineblurVelocityScale", 1.0f / s);
+        }
     }
 
     void OnPreRender()
