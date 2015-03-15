@@ -61,7 +61,7 @@ public class Kineblur : MonoBehaviour
     }
 
     // Visualization mode (exposed only to Editor).
-    public enum Visualization { Off, Velocity, NeighborMax }
+    public enum Visualization { Off, Velocity, NeighborMax, Depth }
 
     [SerializeField] Visualization _visualization;
 

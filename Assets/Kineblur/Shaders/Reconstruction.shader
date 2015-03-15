@@ -218,6 +218,12 @@ Shader "Hidden/Kineblur/Reconstruction"
         return half4(v, 0.5, 1);
     }
 
+    half4 frag_depth(v2f_img i) : SV_Target
+    {
+        half z = frac(tex2D(_VelocityTex, i.uv).z * 128);
+        return half4(z, z, z, 1);
+    }
+
     ENDCG 
 
     Subshader
@@ -249,6 +255,15 @@ Shader "Hidden/Kineblur/Reconstruction"
             CGPROGRAM
             #pragma vertex vert_img
             #pragma fragment frag_neighbormax
+            ENDCG
+        }
+        Pass
+        {
+            ZTest Always Cull Off ZWrite Off
+            Fog { Mode off }
+            CGPROGRAM
+            #pragma vertex vert_img
+            #pragma fragment frag_depth
             ENDCG
         }
     }
