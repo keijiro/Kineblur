@@ -37,9 +37,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
---- !u!127 &3
-LevelGameManager:
-  m_ObjectHideFlags: 0
 --- !u!157 &4
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -68,6 +65,7 @@ LightmapSettings:
     m_TextureCompression: 1
     m_FinalGather: 0
     m_FinalGatherRayCount: 1024
+    m_ReflectionCompression: 2
   m_LightmapSnapshot: {fileID: 112000000, guid: b1a39c095fe6e46c1962a3cfb0481c9f,
     type: 2}
   m_RuntimeCPUUsage: 25
@@ -309,14 +307,13 @@ GameObject:
   - 33: {fileID: 1018475988}
   - 23: {fileID: 1018475986}
   - 95: {fileID: 1018475984}
-  - 114: {fileID: 1018475985}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!95 &1018475984
 Animator:
   serializedVersion: 3
@@ -334,17 +331,6 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &1018475985
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1018475983}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0279f2ee6b4f408785a85561491ea9b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!23 &1018475986
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -449,14 +435,13 @@ GameObject:
   - 33: {fileID: 1461269245}
   - 23: {fileID: 1461269243}
   - 95: {fileID: 1461269247}
-  - 114: {fileID: 1461269244}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!23 &1461269243
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -481,17 +466,6 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!114 &1461269244
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1461269242}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0279f2ee6b4f408785a85561491ea9b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!33 &1461269245
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -599,6 +573,7 @@ ReflectionProbe:
     serializedVersion: 2
     m_Bits: 4294967295
   m_IntensityMultiplier: 1
+  m_BlendDistance: 1
   m_HDR: 1
   m_BoxProjection: 0
   m_RenderDynamicObjects: 0
@@ -621,7 +596,6 @@ GameObject:
   - 114: {fileID: 1679973248}
   - 114: {fileID: 1679973250}
   - 114: {fileID: 1679973245}
-  - 114: {fileID: 1679973246}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -678,10 +652,12 @@ Camera:
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
+  m_TargetEye: 3
   m_HDR: 1
   m_OcclusionCulling: 0
   m_StereoConvergence: 10
   m_StereoSeparation: .0219999999
+  m_StereoMirrorMode: 0
 --- !u!4 &1679973244
 Transform:
   m_ObjectHideFlags: 0
@@ -772,20 +748,6 @@ MonoBehaviour:
     m_PostInfinity: 2
   _ditherMode: 0
   shader: {fileID: 4800000, guid: dc9775b65c52747e69fc4c854c00d696, type: 3}
---- !u!114 &1679973246
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1679973239}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ac62412c354194257a4027b9c2623df6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  framerate: 30
-  superSize: 0
-  autoRecord: 1
 --- !u!114 &1679973247
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -881,10 +843,8 @@ MonoBehaviour:
   _exposureTime: 2
   _sampleCount: 2
   _depthFilter: 5
+  _velocityOffset: {x: 0, y: 0, z: 0}
   _visualization: 0
-  _velocityShader: {fileID: 4800000, guid: 5388fa7d485f64787938aa53ccb91e6e, type: 3}
-  _backgroundShader: {fileID: 4800000, guid: aac9e5bff93f949b9bd57ed2d127e8cd, type: 3}
-  _backgroundMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
   _filterShader: {fileID: 4800000, guid: 4f4ab7eace8794ab486a3f321e46db78, type: 3}
   _reconstructionShader: {fileID: 4800000, guid: aca6bb53661944adab5bc45ae3a401e6,
     type: 3}

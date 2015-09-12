@@ -37,9 +37,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 1876862182}
---- !u!127 &3
-LevelGameManager:
-  m_ObjectHideFlags: 0
 --- !u!157 &4
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -68,6 +65,7 @@ LightmapSettings:
     m_TextureCompression: 1
     m_FinalGather: 0
     m_FinalGatherRayCount: 1024
+    m_ReflectionCompression: 2
   m_LightmapSnapshot: {fileID: 0}
   m_RuntimeCPUUsage: 25
 --- !u!196 &5
@@ -211,7 +209,6 @@ GameObject:
   - 114: {fileID: 911810770}
   - 114: {fileID: 911810769}
   - 114: {fileID: 911810768}
-  - 114: {fileID: 911810772}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -280,10 +277,12 @@ Camera:
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
+  m_TargetEye: 3
   m_HDR: 1
   m_OcclusionCulling: 0
   m_StereoConvergence: 10
   m_StereoSeparation: .0219999999
+  m_StereoMirrorMode: 0
 --- !u!114 &911810768
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -376,10 +375,8 @@ MonoBehaviour:
   _exposureTime: 2
   _sampleCount: 2
   _depthFilter: 8
+  _velocityOffset: {x: 0, y: 0, z: 0}
   _visualization: 0
-  _velocityShader: {fileID: 4800000, guid: 5388fa7d485f64787938aa53ccb91e6e, type: 3}
-  _backgroundShader: {fileID: 4800000, guid: aac9e5bff93f949b9bd57ed2d127e8cd, type: 3}
-  _backgroundMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
   _filterShader: {fileID: 4800000, guid: 4f4ab7eace8794ab486a3f321e46db78, type: 3}
   _reconstructionShader: {fileID: 4800000, guid: aca6bb53661944adab5bc45ae3a401e6,
     type: 3}
@@ -444,20 +441,6 @@ MonoBehaviour:
   blurAndFlaresShader: {fileID: 4800000, guid: be6e39cf196f146d5be72fbefb18ed75, type: 3}
   brightPassFilterShader: {fileID: 4800000, guid: 0aeaa4cb29f5d4e9c8455f04c8575c8c,
     type: 3}
---- !u!114 &911810772
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 911810762}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ac62412c354194257a4027b9c2623df6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  framerate: 30
-  superSize: 0
-  autoRecord: 1
 --- !u!1 &1297636758
 GameObject:
   m_ObjectHideFlags: 0
@@ -468,7 +451,6 @@ GameObject:
   - 4: {fileID: 1297636761}
   - 33: {fileID: 1297636760}
   - 23: {fileID: 1297636759}
-  - 114: {fileID: 1297636762}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -519,17 +501,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 507247256}
   m_RootOrder: 0
---- !u!114 &1297636762
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1297636758}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0279f2ee6b4f408785a85561491ea9b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1836432974
 GameObject:
   m_ObjectHideFlags: 0
@@ -540,7 +511,6 @@ GameObject:
   - 4: {fileID: 1836432975}
   - 23: {fileID: 1836432976}
   - 33: {fileID: 1836432977}
-  - 114: {fileID: 1836432978}
   m_Layer: 0
   m_Name: Cover
   m_TagString: Untagged
@@ -591,17 +561,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1836432974}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &1836432978
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1836432974}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0279f2ee6b4f408785a85561491ea9b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1873421169
 GameObject:
   m_ObjectHideFlags: 0
@@ -645,6 +604,7 @@ ReflectionProbe:
     serializedVersion: 2
     m_Bits: 4294967295
   m_IntensityMultiplier: 1
+  m_BlendDistance: 1
   m_HDR: 1
   m_BoxProjection: 0
   m_RenderDynamicObjects: 0
