@@ -60,6 +60,14 @@ public class Kineblur : MonoBehaviour
         set { _depthFilter = value; }
     }
 
+    // Camera velocity offset.
+    [SerializeField] Vector3 _velocityOffset;
+
+    public Vector3 velocityOffset {
+        get { return _velocityOffset; }
+        set { _velocityOffset = value; }
+    }
+
     // Visualization mode (exposed only to Editor).
     public enum Visualization { Off, Velocity, NeighborMax, Depth }
 
@@ -69,14 +77,10 @@ public class Kineblur : MonoBehaviour
 
     #region External Asset References
 
-    [SerializeField] Shader _velocityShader;
-    [SerializeField] Shader _backgroundShader;
-    [SerializeField] Mesh _backgroundMesh;
     [SerializeField] Shader _filterShader;
     [SerializeField] Shader _reconstructionShader;
 
     // Materials for handling the shaders.
-    Material _backgroundMaterial;
     Material _filterMaterial;
     Material _reconstructionMaterial;
 
@@ -84,14 +88,9 @@ public class Kineblur : MonoBehaviour
 
     #region Private Objects
 
-    // Velocity buffer.
-    RenderTexture _velocityBuffer;
-
-    // Velocity camera (used for rendering the velocity buffer).
-    GameObject _velocityCamera;
-
     // V*P matrix in the previous frame.
-    Matrix4x4 _previousVPMatrix;
+    Matrix4x4 _vpMatrixHistory1;
+    Matrix4x4 _vpMatrixHistory2;
 
     // Exposure time settings.
     static int[] exposureTimeTable = { 1, 15, 30, 60, 125 };
@@ -100,21 +99,38 @@ public class Kineblur : MonoBehaviour
 
     #region Private Methods
 
-    Matrix4x4 CalculateVPMatrix()
-    {
-        var cam = GetComponent<Camera>();
-        Matrix4x4 V = cam.worldToCameraMatrix;
-        Matrix4x4 P = GL.GetGPUProjectionMatrix(cam.projectionMatrix, true);
-        return P * V;
+    Matrix4x4 CurrentVPMatrix {
+        get {
+            var cam = GetComponent<Camera>();
+            Matrix4x4 V = cam.worldToCameraMatrix;
+            Matrix4x4 P = GL.GetGPUProjectionMatrix(cam.projectionMatrix, true);
+            return P * V;
+        }
+    }
+
+    Matrix4x4 BackwordMatrix {
+        get {
+            // inverse view matrix
+            var inv_view = GetComponent<Camera>().cameraToWorldMatrix;
+            // velocity offset translation matrix
+            var offs = Matrix4x4.identity;
+            var v = _velocityOffset * Time.deltaTime;
+            offs.SetColumn(3, new Vector4(v.x, v.y, v.z, 1));
+            // combine them all
+            return _vpMatrixHistory2 * offs * inv_view;
+        }
+    }
+
+    float VelocityScale {
+        get {
+            if (_exposureTime == 0) return 1;
+            var exposure =  exposureTimeTable[(int)_exposureTime];
+            return 1.0f / (exposure * Time.smoothDeltaTime);
+        }
     }
 
     void SetUpResources()
     {
-        if (_backgroundMaterial == null) {
-            _backgroundMaterial = new Material(_backgroundShader);
-            _backgroundMaterial.hideFlags = HideFlags.HideAndDontSave;
-        }
-
         if (_filterMaterial == null) {
             _filterMaterial = new Material(_filterShader);
             _filterMaterial.hideFlags = HideFlags.HideAndDontSave;
@@ -144,6 +160,9 @@ public class Kineblur : MonoBehaviour
             _reconstructionMaterial.EnableKeyword("QUALITY_HIGH");
         }
 
+        _filterMaterial.SetFloat("_VelocityScale", VelocityScale);
+        _filterMaterial.SetMatrix("_BackwordMatrix", BackwordMatrix);
+
         _filterMaterial.SetFloat("_MaxBlurRadius", 40);
         _reconstructionMaterial.SetFloat("_MaxBlurRadius", 40);
 
@@ -156,101 +175,28 @@ public class Kineblur : MonoBehaviour
 
     void Start()
     {
-        _previousVPMatrix = CalculateVPMatrix();
-
-        // Default velocity writer matrix for static objects.
-        Shader.SetGlobalMatrix("_KineblurBackMatrix", Matrix4x4.identity);
+        _vpMatrixHistory1 = _vpMatrixHistory2 = CurrentVPMatrix;
     }
 
     void OnEnable()
     {
-        if (_velocityCamera == null)
-        {
-            SetUpResources();
-
-            // Make a velocity camera instance.
-            _velocityCamera = new GameObject("Velocity Camera", typeof(Camera));
-            _velocityCamera.hideFlags = HideFlags.HideAndDontSave;
-
-            // Make a command buffer for writing background velocity.
-            var cmd = new CommandBuffer();
-            cmd.name = "Background Velocity";
-            cmd.DrawMesh(_backgroundMesh, Matrix4x4.identity, _backgroundMaterial);
-
-            // Set up the velocity camera.
-            var cam = _velocityCamera.GetComponent<Camera>();
-            cam.enabled = false;
-            cam.AddCommandBuffer(CameraEvent.AfterForwardOpaque, cmd);
-        }
-    }
-
-    void OnDisable()
-    {
-        // Delete the velocity camera.
-        if (_velocityCamera != null) DestroyImmediate(_velocityCamera);
+        GetComponent<Camera>().depthTextureMode |= DepthTextureMode.Depth;
     }
 
     void LateUpdate()
     {
-        // Update the VP matrix for the velocity writer.
-        Shader.SetGlobalMatrix("_KineblurVPMatrix", _previousVPMatrix);
-
-        // Store the current VP matrix.
-        _previousVPMatrix = CalculateVPMatrix();
-
-        // Set the exposure time as a velocity scale.
-        if (_exposureTime == 0)
-        {
-            Shader.SetGlobalFloat("_KineblurVelocityScale", 1);
-        }
-        else
-        {
-            var s = Time.smoothDeltaTime * exposureTimeTable[(int)_exposureTime];
-            Shader.SetGlobalFloat("_KineblurVelocityScale", 1.0f / s);
-        }
-    }
-
-    void OnPreRender()
-    {
-        var cam = GetComponent<Camera>();
-        var vcam = _velocityCamera.GetComponent<Camera>();
-
-        // Needs a camera depth texture for the depth filter.
-        //if (_depthFilter)
-            cam.depthTextureMode |= DepthTextureMode.Depth;
-
-        // Recreate the velocity buffer.
-        if (_velocityBuffer != null)
-            RenderTexture.ReleaseTemporary(_velocityBuffer);
-
-        _velocityBuffer = RenderTexture.GetTemporary(
-            (int)cam.pixelWidth,
-            (int)cam.pixelHeight,
-            24,
-            RenderTextureFormat.RGHalf
-        );
-
-        // Reset the velocity camera and request rendering.
-        vcam.CopyFrom(cam);
-        vcam.clearFlags = CameraClearFlags.SolidColor;
-        vcam.depthTextureMode = DepthTextureMode.None;
-        vcam.backgroundColor = Color.black;
-        vcam.targetTexture = _velocityBuffer;
-        vcam.RenderWithShader(_velocityShader, "RenderType");
+        _vpMatrixHistory2 = _vpMatrixHistory1;
+        _vpMatrixHistory1 = CurrentVPMatrix;
     }
 
     void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
-        // Simply blit if not ready.
-        if (_velocityBuffer == null) {
-            Graphics.Blit(source, destination);
-            return;
-        }
+        SetUpResources();
 
         UpdateReconstructionMaterial();
 
-        var tw = _velocityBuffer.width;
-        var th = _velocityBuffer.height;
+        var tw = source.width;
+        var th = source.height;
 
         RenderTexture vbuffer = RenderTexture.GetTemporary(tw, th, 0, RenderTextureFormat.ARGB2101010);
         RenderTexture tile1 = RenderTexture.GetTemporary(tw / 10, th / 10, 0, RenderTextureFormat.RGHalf);
@@ -263,7 +209,7 @@ public class Kineblur : MonoBehaviour
         tile2.filterMode = FilterMode.Point;
         tile3.filterMode = FilterMode.Point;
 
-        Graphics.Blit(_velocityBuffer, vbuffer, _filterMaterial, 0);
+        Graphics.Blit(source, vbuffer, _filterMaterial, 0);
         Graphics.Blit(vbuffer, tile1, _filterMaterial, 1);
         Graphics.Blit(tile1, tile2, _filterMaterial, 2);
         Graphics.Blit(tile2, tile3, _filterMaterial, 4);

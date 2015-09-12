@@ -38,6 +38,12 @@ Shader "Hidden/Kineblur/Velocity Filters"
 
     sampler2D_float _CameraDepthTexture;
 
+    // Backword projection matrix (ViewPrj_prev * View_current^-1)
+    float4x4 _BackwordMatrix;
+
+    // Velocity scale factor (used to adjusting the exposure time).
+    float _VelocityScale;
+
     // Maximum blur radius.
     float _MaxBlurRadius;
 
@@ -50,7 +56,16 @@ Shader "Hidden/Kineblur/Velocity Filters"
     // Velocity map setup shader.
     half4 frag_velocity_map(v2f_img i) : SV_Target
     {
-        float2 v = tex2D(_MainTex, i.uv);
+        float d = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv.xy);
+
+        // Reconstruct the view space position from the depth value.
+        float2 p11_22 = float2(unity_CameraProjection._11, unity_CameraProjection._22);
+        float2 cpos = i.uv * 2 - 1;
+        float3 vpos = float3(cpos / p11_22, -1) * LinearEyeDepth(d);
+
+        // Calculate the velocity vector.
+        float4 prev = mul(_BackwordMatrix, float4(vpos, 1));
+        float2 v = (prev.xy / prev.w - cpos) * _VelocityScale;
 
         // Halve the velocity and convert to the one-unit-per-pixel scale.
         v = v * 0.5 / _MainTex_TexelSize.xy;
@@ -60,10 +75,10 @@ Shader "Hidden/Kineblur/Velocity Filters"
         v *= min(lv, _MaxBlurRadius) / max(lv, 1e-6);
 
         // Sample the depth of the pixel.
-        half z = Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv));
+        half z01 = Linear01Depth(d);
 
         // Pack them into a 10/10/10/2 texel.
-        return half4((v / _MaxBlurRadius + 1) / 2, z, 0);
+        return half4((v / _MaxBlurRadius + 1) / 2, z01, 0);
     }
 
     // TileMax filters.
