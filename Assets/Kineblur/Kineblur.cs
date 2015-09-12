@@ -103,7 +103,7 @@ public class Kineblur : MonoBehaviour
         get {
             var cam = GetComponent<Camera>();
             Matrix4x4 V = cam.worldToCameraMatrix;
-            Matrix4x4 P = GL.GetGPUProjectionMatrix(cam.projectionMatrix, true);
+            Matrix4x4 P = GL.GetGPUProjectionMatrix(cam.projectionMatrix, false);
             return P * V;
         }
     }
