@@ -82,7 +82,7 @@ Shader "Hidden/Kineblur/Velocity Filters"
     }
 
     // TileMax filters.
-    half2 frag_tile_max_x10(v2f_img i) : SV_Target
+    half4 frag_tile_max_x10(v2f_img i) : SV_Target
     {
         float2 uv = i.uv - _MainTex_TexelSize.xy * 4.5;
 
@@ -102,10 +102,10 @@ Shader "Hidden/Kineblur/Velocity Filters"
             uv += dv;
         }
 
-        return v;
+        return half4(v, 0, 0);
     }
 
-    half2 frag_tile_max_x4(v2f_img i) : SV_Target
+    half4 frag_tile_max_x4(v2f_img i) : SV_Target
     {
         float2 tx = _MainTex_TexelSize.xy;
 
@@ -134,10 +134,10 @@ Shader "Hidden/Kineblur/Velocity Filters"
         half2 vc = vmax(vmax(vmax(v09, v10), v11), v12);
         half2 vd = vmax(vmax(vmax(v13, v14), v15), v16);
 
-        return vmax(vmax(vmax(va, vb), vc), vd);
+        return half4(vmax(vmax(vmax(va, vb), vc), vd), 0, 0);
     }
 
-    half2 frag_tile_max_x2(v2f_img i) : SV_Target
+    half4 frag_tile_max_x2(v2f_img i) : SV_Target
     {
         float2 tx = _MainTex_TexelSize.xy;
 
@@ -147,11 +147,11 @@ Shader "Hidden/Kineblur/Velocity Filters"
         half2 v3 = tex2D(_MainTex, i.uv + tx * float2(-0.5, +0.5)).rg;
         half2 v4 = tex2D(_MainTex, i.uv + tx * float2(+0.5, +0.5)).rg;
 
-        return vmax(vmax(vmax(v1, v2), v3), v4);
+        return half4(vmax(vmax(vmax(v1, v2), v3), v4), 0, 0);
     }
 
     // NeighborMax filter.
-    half2 frag_neighbor_max(v2f_img i) : SV_Target
+    half4 frag_neighbor_max(v2f_img i) : SV_Target
     {
         static const half cw = 1.01f; // center weight tweak
 
@@ -173,7 +173,7 @@ Shader "Hidden/Kineblur/Velocity Filters"
         half2 vb = vmax(v4, vmax(v5, v6));
         half2 vc = vmax(v7, vmax(v8, v9));
 
-        return vmax(va, vmax(vb, vc)) / cw;
+        return half4(vmax(va, vmax(vb, vc)) / cw, 0, 0);
     }
 
     ENDCG 
