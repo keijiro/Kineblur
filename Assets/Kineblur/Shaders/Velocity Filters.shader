@@ -63,7 +63,7 @@ Shader "Hidden/Kineblur/Velocity Filters"
 		float2 v = tex2D(_CameraMotionVectorsTexture, i.uv.xy).xy*_VelocityScale;
 
         // Halve the velocity and convert to the one-unit-per-pixel scale.
-        v = v * 0.5 / _MainTex_TexelSize.xy;
+        v = v * 0.5 / _CameraMotionVectorsTexture_TexelSize.xy;
 
         // Clamp the vector with the maximum blur radius.
         float lv = length(v);
