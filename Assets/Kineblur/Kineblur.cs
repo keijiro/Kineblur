@@ -88,9 +88,6 @@ public class Kineblur : MonoBehaviour
 
     #region Private Objects
 
-    // V*P matrix in the previous frame.
-    Matrix4x4 _vpMatrixHistory1;
-    Matrix4x4 _vpMatrixHistory2;
 
     // Exposure time settings.
     static int[] exposureTimeTable = { 1, 15, 30, 60, 125 };
@@ -99,27 +96,7 @@ public class Kineblur : MonoBehaviour
 
     #region Private Methods
 
-    Matrix4x4 CurrentVPMatrix {
-        get {
-            var cam = GetComponent<Camera>();
-            Matrix4x4 V = cam.worldToCameraMatrix;
-            Matrix4x4 P = GL.GetGPUProjectionMatrix(cam.projectionMatrix, false);
-            return P * V;
-        }
-    }
 
-    Matrix4x4 BackwordMatrix {
-        get {
-            // inverse view matrix
-            var inv_view = GetComponent<Camera>().cameraToWorldMatrix;
-            // velocity offset translation matrix
-            var offs = Matrix4x4.identity;
-            var v = _velocityOffset * Time.deltaTime;
-            offs.SetColumn(3, new Vector4(v.x, v.y, v.z, 1));
-            // combine them all
-            return _vpMatrixHistory2 * offs * inv_view;
-        }
-    }
 
     float VelocityScale {
         get {
@@ -161,7 +138,6 @@ public class Kineblur : MonoBehaviour
         }
 
         _filterMaterial.SetFloat("_VelocityScale", VelocityScale);
-        _filterMaterial.SetMatrix("_BackwordMatrix", BackwordMatrix);
 
         _filterMaterial.SetFloat("_MaxBlurRadius", 40);
         _reconstructionMaterial.SetFloat("_MaxBlurRadius", 40);
@@ -173,21 +149,12 @@ public class Kineblur : MonoBehaviour
 
     #region MonoBehaviour Functions
 
-    void Start()
-    {
-        _vpMatrixHistory1 = _vpMatrixHistory2 = CurrentVPMatrix;
-    }
 
     void OnEnable()
     {
-        GetComponent<Camera>().depthTextureMode |= DepthTextureMode.Depth;
+        GetComponent<Camera>().depthTextureMode = DepthTextureMode.Depth | DepthTextureMode.MotionVectors;
     }
 
-    void LateUpdate()
-    {
-        _vpMatrixHistory2 = _vpMatrixHistory1;
-        _vpMatrixHistory1 = CurrentVPMatrix;
-    }
 
     void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
