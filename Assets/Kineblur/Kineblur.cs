@@ -83,6 +83,9 @@ public class Kineblur : MonoBehaviour
     // Exposure time settings.
     static int[] exposureTimeTable = { 1, 15, 30, 60, 125 };
 
+    // Loop count settings.
+    static int[] loopCountTable = { 5, 10, 15 };
+
     #endregion
 
     #region Private Methods
@@ -110,28 +113,14 @@ public class Kineblur : MonoBehaviour
 
     void UpdateReconstructionMaterial()
     {
-        if (_sampleCount == SampleCount.Low)
-        {
-            _reconstructionMaterial.DisableKeyword("QUALITY_MEDIUM");
-            _reconstructionMaterial.DisableKeyword("QUALITY_HIGH");
-        }
-        else if (_sampleCount == SampleCount.Medium)
-        {
-            _reconstructionMaterial.EnableKeyword("QUALITY_MEDIUM");
-            _reconstructionMaterial.DisableKeyword("QUALITY_HIGH");
-        }
-        else
-        {
-            _reconstructionMaterial.DisableKeyword("QUALITY_MEDIUM");
-            _reconstructionMaterial.EnableKeyword("QUALITY_HIGH");
-        }
-
         _filterMaterial.SetFloat("_VelocityScale", VelocityScale);
 
         _filterMaterial.SetFloat("_MaxBlurRadius", 40);
         _reconstructionMaterial.SetFloat("_MaxBlurRadius", 40);
 
         _reconstructionMaterial.SetFloat("_DepthFilterStrength", _depthFilter);
+
+        _reconstructionMaterial.SetInt("_LoopCount", loopCountTable[(int)_sampleCount]);
     }
 
     #endregion

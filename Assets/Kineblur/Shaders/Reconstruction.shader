@@ -33,8 +33,6 @@ Shader "Hidden/Kineblur/Reconstruction"
 
     CGINCLUDE
 
-    #pragma multi_compile QUALITY_LOW QUALITY_MEDIUM QUALITY_HIGH
-
     #include "UnityCG.cginc"
 
     sampler2D _MainTex;
@@ -52,14 +50,7 @@ Shader "Hidden/Kineblur/Reconstruction"
 
     // Filter coefficients.
     static const float sample_jitter = 2;
-
-    #if QUALITY_HIGH
-    static const int sample_count = 30;
-    #elif QUALITY_MEDIUM
-    static const int sample_count = 20;
-    #else
-    static const int sample_count = 10;
-    #endif
+    uint _LoopCount;
 
     // Safer version of vector normalization.
     float2 safe_norm(float2 v)
@@ -68,7 +59,6 @@ Shader "Hidden/Kineblur/Reconstruction"
         return v / l * step(0.5, l);
     }
 
-    // Interleaved gradient function from CoD AW.
     // http://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare
     float gnoise(float2 uv, float2 offs)
     {
@@ -166,18 +156,19 @@ Shader "Hidden/Kineblur/Reconstruction"
         float2 w_c = rnmix(w_p, v_c_n, (l_v_c - 0.5) / 1.5);
 
         // First itegration sample (center sample).
-        float totalWeight = (float)sample_count / (l_v_c * 40);
+        float sampleCount = _LoopCount * 2.0f;
+        float totalWeight = sampleCount / (l_v_c * 40);
         float3 result = tex2D(_MainTex, p_uv) * totalWeight;
 
         // Start from t = -1 with small jitter.
-        float t = -1.0 + gnoise(p_uv, 0) * sample_jitter / (sample_count + sample_jitter);
-        float dt = 2.0 / (sample_count + sample_jitter);
+        float t = -1.0 + gnoise(p_uv, 0) * sample_jitter / (sampleCount + sample_jitter);
+        float dt = 2.0 / (sampleCount + sample_jitter);
 
         // Precalc the w_A parameters.
         float w_A1 = dot(w_c, v_c_n);
         float w_A2 = dot(w_c, v_max_n);
 
-        for (int c = 0; c < sample_count / 2; c++)
+        for (uint c = 0; c < _LoopCount; c++)
         {
             // Odd-numbered sample: sample along v_c.
             {
